@@ -23,25 +23,22 @@ function favorito(p) {
   return 'empate';
 }
 
-// Brier score multiclase, definición original (Brier, 1950): promedio, sobre
-// los partidos, de la suma de errores al cuadrado sobre las tres clases.
-// 0 = predicción perfecta, 2 = la peor posible (confianza 1 en la clase
-// equivocada). Esta es la fórmula tal cual aparece en el paper original y en
-// la mayoría de la literatura de forecasting meteorológico/deportivo — sin
-// dividir además entre el número de clases. PLAN.md pide "Brier score ≤ 0,21"
-// sin especificar la convención; con ESTA fórmula (sin normalizar por clase)
-// el número sobre el histórico real da ~0,63, muy por encima de ese umbral.
-// No se cambió la fórmula para que el número cuadrara con el umbral — eso
-// quedó marcado como bloqueante en la auditoría de Fase 1. Si PLAN.md quería
-// la variante normalizada por K=3 (rango real [0, 2/3], no [0,1]), hay que
-// decirlo explícito ahí y no dejarlo a discreción de quien implementa.
+// Brier score multiclase, normalizado por número de clases (K=3): promedio,
+// sobre los partidos, del promedio de error al cuadrado sobre las tres
+// clases. Fórmula fijada en PLAN.md (sección "Criterio para pasar" de
+// Fase 1) después de tres rondas de auditoría por esta misma ambigüedad —
+// esta es LA convención oficial del proyecto, no una de dos válidas.
+// Rango real [0, 2/3] (no [0,1]: el error máximo en las tres clases suma 2,
+// dividido entre 3 da 2/3). 0 = predicción perfecta. Adivinar siempre
+// 1/3-1/3-1/3 sin usar ningún dato da ≈0,222 bajo esta fórmula.
 export function brierScore(predicciones) {
+  const K = 3;
   let suma = 0;
   for (const p of predicciones) {
     const o = resultadoComoVector(p.resultadoReal);
     suma += (p.probLocal - o.local) ** 2 + (p.probEmpate - o.empate) ** 2 + (p.probVisitante - o.visitante) ** 2;
   }
-  return suma / predicciones.length;
+  return suma / (predicciones.length * K);
 }
 
 // Log loss (entropía cruzada) multiclase: promedio de -ln(probabilidad

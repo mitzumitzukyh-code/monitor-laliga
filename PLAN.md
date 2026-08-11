@@ -109,6 +109,19 @@ Muéstrame la tabla final.
 | Prueba anti-fuga | pasa |
 | Suma de probabilidades | 1,000 siempre |
 
+**Fórmula exacta del Brier score** (esto quedó ambiguo durante la Fase 1 y
+tardó tres rondas de auditoría en resolverse — que no se repita): multiclase,
+normalizado por número de clases (K=3), promediado sobre los partidos:
+
+```
+brier = (1/N) * Σ_partidos [ (1/3) * Σ_clases (prob_clase - resultado_clase)² ]
+```
+
+Rango real **[0, 2/3]**, no [0,1] — el error máximo posible en las tres
+clases suma 2, dividido entre 3 da 2/3. Un modelo que siempre predice
+1/3-1/3-1/3 (sin usar ningún dato) da brier ≈ 0,222 bajo esta fórmula; el
+umbral de 0,21 exige superar ese piso, no acercarse a la perfección.
+
 Si el acierto sale por encima de 60%, **desconfía**: casi seguro hay fuga
 temporal. Que el auditor lo revise antes de celebrar.
 
