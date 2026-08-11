@@ -5,16 +5,16 @@ import { brierScore, logLoss, porcentajeAcierto, metricas, probabilidadesImplici
 // Dos partidos hechos a mano:
 //   1) probs 0.5/0.3/0.2, gana el local (favorito, prob puesta = 0.5)
 //   2) probs 0.2/0.3/0.5, gana el visitante (favorito, prob puesta = 0.5)
-// Suma de error al cuadrado de cada uno: (0.5-1)^2+(0.3-0)^2+(0.2-0)^2 = 0.25+0.09+0.04 = 0.38
-// Brier normalizado por 3 clases: 0.38 / 3 = 0.126666...
+// Brier de cada uno (fórmula original, sin normalizar por clase):
+// (0.5-1)^2+(0.3-0)^2+(0.2-0)^2 = 0.25+0.09+0.04 = 0.38
 // Log loss de cada uno: -ln(0.5) = ln(2)
 const PREDICCIONES = [
   { probLocal: 0.5, probEmpate: 0.3, probVisitante: 0.2, resultadoReal: 'local', temporada: '2099-00' },
   { probLocal: 0.2, probEmpate: 0.3, probVisitante: 0.5, resultadoReal: 'visitante', temporada: '2099-00' },
 ];
 
-test('brierScore da 0.38/3 a mano', () => {
-  assert.ok(Math.abs(brierScore(PREDICCIONES) - 0.38 / 3) < 1e-12);
+test('brierScore da 0.38 a mano', () => {
+  assert.ok(Math.abs(brierScore(PREDICCIONES) - 0.38) < 1e-12);
 });
 
 test('logLoss da ln(2) a mano', () => {
@@ -36,9 +36,9 @@ test('predicción perfecta da brier=0, logLoss=0, acierto=100%', () => {
   assert.equal(m.acierto, 1);
 });
 
-test('predicción totalmente errada (confianza 1 en la clase equivocada) da brier=2/3', () => {
+test('predicción totalmente errada (confianza 1 en la clase equivocada) da brier=2', () => {
   const errada = [{ probLocal: 1, probEmpate: 0, probVisitante: 0, resultadoReal: 'visitante' }];
-  assert.ok(Math.abs(brierScore(errada) - 2 / 3) < 1e-12);
+  assert.equal(brierScore(errada), 2);
 });
 
 test('probabilidadesImplicitas normaliza y quita el margen de la casa', () => {
@@ -59,5 +59,5 @@ test('metricasMercado calcula igual que metricas() cuando sí hay cuotas', () =>
     { ...PREDICCIONES[1], mercadoProbLocal: 0.2, mercadoProbEmpate: 0.3, mercadoProbVisitante: 0.5 },
   ];
   const m = metricasMercado(conMercado);
-  assert.ok(Math.abs(m.brier - 0.38 / 3) < 1e-12);
+  assert.ok(Math.abs(m.brier - 0.38) < 1e-12);
 });
