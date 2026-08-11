@@ -40,7 +40,14 @@ function parsearFecha(crudo) {
   const partes = crudo.split('/');
   if (partes.length !== 3) return null;
   const [d, m, aCrudo] = partes;
-  const a = aCrudo.length === 2 ? `20${aCrudo}` : aCrudo;
+  let a;
+  if (aCrudo.length === 4) {
+    a = aCrudo;
+  } else if (aCrudo.length === 2) {
+    a = `20${aCrudo}`; // football-data solo usa años 2000+ en este rango de temporadas
+  } else {
+    throw new Error(`Año con formato inesperado en fecha "${crudo}"`);
+  }
   return `${a}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
 }
 
@@ -72,7 +79,13 @@ function parsearCSV(texto, temporada) {
     const golesVisitante = Number(campos[idx.golesVisitante]);
 
     if (!fecha || !local || !visitante) continue;
-    if (!Number.isFinite(golesLocal) || !Number.isFinite(golesVisitante)) continue;
+    if (!Number.isFinite(golesLocal) || !Number.isFinite(golesVisitante)) continue; // partido sin resultado (fila incompleta)
+
+    if (golesLocal < 0 || golesVisitante < 0) {
+      throw new Error(
+        `Goles negativos en ${fecha} ${local} vs ${visitante}: ${golesLocal}-${golesVisitante} (temporada ${temporada})`
+      );
+    }
 
     partidos.push({ fecha, local, visitante, golesLocal, golesVisitante, temporada });
   }
