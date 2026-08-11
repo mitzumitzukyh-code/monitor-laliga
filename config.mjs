@@ -37,7 +37,29 @@ export const JORNADAS_DESCARTADAS = 6;
 // defensa. Sin esto, un equipo con pocos partidos (recién ascendido, racha
 // de blanqueadas al arranque) puede dar una tasa de 0 goles concedidos
 // exacta, y eso produce probabilidades de 0% o 100% en el resultado final
-// (la auditoría de Fase 1 encontró 9 casos así en las 1600 predicciones del
-// backtest antes de este ajuste). Ver PESO_PRIOR_PARTIDOS calibrado contra
-// el barrido en el mismo comentario de RHO/SEMIVIDA_JORNADAS.
+// (la auditoría de Fase 1, ronda 2, encontró 9 casos así en las 1600
+// predicciones del backtest antes de este ajuste).
+//
+// Calibrado con barrido real sobre backtest(partidos, { pesoPrior }),
+// 1600 predicciones, midiendo brierScore/logLoss/porcentajeAcierto de
+// juez/notas.mjs (auditoría Fase 1, ronda 3):
+//
+//   pesoPrior   acierto   brier     logLoss   ceros/unos
+//   0           50.56%    0.60269   1.06867   9
+//   1           50.69%    0.59897   1.00372   0
+//   2           50.81%    0.59711   1.00047   0
+//   3           50.94%    0.59610   0.99888   0
+//   4           51.19%    0.59556   0.99807   0   <- elegido
+//   6           51.13%    0.59523   0.99765   0
+//   8           51.00%    0.59544   0.99801   0
+//   12          51.19%    0.59651   0.99970   0
+//   20          50.69%    0.59946   1.00410   0
+//   30          51.00%    0.60316   1.00946   0
+//   60          48.69%    0.61179   1.02164   0
+//   120         47.44%    0.62144   1.03498   0
+//
+// Meseta amplia entre 3 y 12 (todas las métricas casi empatadas); 4 queda
+// cómodo en el medio, ni en el borde donde ceros/unos aparecen de nuevo (0)
+// ni forzando el extremo donde el suavizado ya empieza a emparejar equipos
+// distintos y las métricas empeoran (a partir de ~30).
 export const PESO_PRIOR_PARTIDOS = 4;
