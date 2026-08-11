@@ -1,0 +1,3 @@
+.env
+datos/cache/
+node_modules/
