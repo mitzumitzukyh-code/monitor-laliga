@@ -9,7 +9,7 @@
 // normalizado contra lo que anotaría un visitante promedio (promedioLigaFuera).
 // "defensaFuera[equipo]" es lo simétrico jugando de visitante.
 
-import { SEMIVIDA_JORNADAS } from '../config.mjs';
+import { SEMIVIDA_JORNADAS, PESO_PRIOR_PARTIDOS } from '../config.mjs';
 
 function pesoDecaimiento(indiceDesdeElMasReciente, semividaJornadas) {
   // indice 0 = partido más reciente del equipo -> peso 1
@@ -48,9 +48,15 @@ function historialPorEquipo(anteriores, semividaJornadas) {
   return porEquipo;
 }
 
-function promedioPonderado(registros, filtro, campo) {
-  let numerador = 0;
-  let denominador = 0;
+// Promedio ponderado con suavizado bayesiano: se le suman pesoPrior
+// "partidos fantasma" con el valor promedio de la liga (valorPrior) antes de
+// promediar. Un equipo con pocos partidos (recién ascendido, arranque de
+// temporada, racha de blanqueadas) queda empujado hacia el promedio de liga
+// en vez de dar una tasa exacta basada en 1-2 datos. Con pesoPrior=0 se
+// desactiva y da el promedio ponderado puro.
+function promedioPonderado(registros, filtro, campo, pesoPrior, valorPrior) {
+  let numerador = pesoPrior * valorPrior;
+  let denominador = pesoPrior;
   for (const r of registros) {
     if (!filtro(r)) continue;
     numerador += r.peso * r[campo];
@@ -62,7 +68,12 @@ function promedioPonderado(registros, filtro, campo) {
 // Calcula las fuerzas de ataque/defensa de todos los equipos usando SOLO
 // partidos anteriores a fechaCorte, con decaimiento exponencial por vida
 // media en jornadas del propio equipo.
-export function fuerzas(partidos, fechaCorte, semividaJornadas = SEMIVIDA_JORNADAS) {
+export function fuerzas(
+  partidos,
+  fechaCorte,
+  semividaJornadas = SEMIVIDA_JORNADAS,
+  pesoPrior = PESO_PRIOR_PARTIDOS
+) {
   const anteriores = partidosAnteriores(partidos, fechaCorte);
 
   let sumaGolesCasa = 0;
@@ -81,10 +92,10 @@ export function fuerzas(partidos, fechaCorte, semividaJornadas = SEMIVIDA_JORNAD
     const esCasa = (r) => r.esCasa;
     const esFuera = (r) => !r.esCasa;
     porEquipo.set(equipo, {
-      ataqueCasa: promedioPonderado(registros, esCasa, 'golesFavor') / promedioLigaCasa,
-      defensaCasa: promedioPonderado(registros, esCasa, 'golesContra') / promedioLigaFuera,
-      ataqueFuera: promedioPonderado(registros, esFuera, 'golesFavor') / promedioLigaFuera,
-      defensaFuera: promedioPonderado(registros, esFuera, 'golesContra') / promedioLigaCasa,
+      ataqueCasa: promedioPonderado(registros, esCasa, 'golesFavor', pesoPrior, promedioLigaCasa) / promedioLigaCasa,
+      defensaCasa: promedioPonderado(registros, esCasa, 'golesContra', pesoPrior, promedioLigaFuera) / promedioLigaFuera,
+      ataqueFuera: promedioPonderado(registros, esFuera, 'golesFavor', pesoPrior, promedioLigaFuera) / promedioLigaFuera,
+      defensaFuera: promedioPonderado(registros, esFuera, 'golesContra', pesoPrior, promedioLigaCasa) / promedioLigaCasa,
     });
   }
 

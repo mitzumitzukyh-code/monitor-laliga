@@ -36,6 +36,17 @@ test('todas las predicciones suman 1 en sus tres probabilidades', () => {
   }
 });
 
+test('control 4: ninguna probabilidad real del backtest es exactamente 0 o 1 (equipos con muestra chica no deben dar certezas absolutas)', () => {
+  const predicciones = backtest(partidos);
+  assert.ok(predicciones.length > 0);
+  for (const p of predicciones) {
+    for (const [nombre, valor] of [['probLocal', p.probLocal], ['probEmpate', p.probEmpate], ['probVisitante', p.probVisitante]]) {
+      assert.ok(valor > 0, `${clave(p)} ${nombre}=${valor} (debería ser > 0, no un 0% exacto)`);
+      assert.ok(valor < 1, `${clave(p)} ${nombre}=${valor} (debería ser < 1, no un 100% exacto)`);
+    }
+  }
+});
+
 test('anti-fuga: recortar el histórico a la mitad no cambia ni una predicción de la primera mitad', () => {
   const mitad = Math.floor(partidos.length / 2);
   const partidosRecortados = partidos.slice(0, mitad);

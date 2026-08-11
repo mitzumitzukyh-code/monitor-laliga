@@ -31,3 +31,13 @@ export const SEMIVIDA_JORNADAS = 150;
 // Jornadas descartadas al inicio de cada temporada en el backtest: no hay
 // suficiente historial reciente para calcular fuerzas confiables.
 export const JORNADAS_DESCARTADAS = 6;
+
+// Suavizado bayesiano: cantidad de "partidos fantasma" con el promedio de
+// liga que se le suman a cada equipo antes de calcular su tasa de ataque o
+// defensa. Sin esto, un equipo con pocos partidos (recién ascendido, racha
+// de blanqueadas al arranque) puede dar una tasa de 0 goles concedidos
+// exacta, y eso produce probabilidades de 0% o 100% en el resultado final
+// (la auditoría de Fase 1 encontró 9 casos así en las 1600 predicciones del
+// backtest antes de este ajuste). Ver PESO_PRIOR_PARTIDOS calibrado contra
+// el barrido en el mismo comentario de RHO/SEMIVIDA_JORNADAS.
+export const PESO_PRIOR_PARTIDOS = 4;

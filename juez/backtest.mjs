@@ -61,7 +61,7 @@ function resultadoDe(golesLocal, golesVisitante) {
 // suficiente) y cualquier partido donde algún equipo no tenga fuerzas
 // calculables todavía (recién ascendido, sin partidos previos).
 export function backtest(partidos, opciones = {}) {
-  const { jornadasDescartadas = JORNADAS_DESCARTADAS, semividaJornadas, rho } = opciones;
+  const { jornadasDescartadas = JORNADAS_DESCARTADAS, semividaJornadas, rho, pesoPrior } = opciones;
 
   const conJornada = agregarJornadas(partidos);
   const inicio = inicioDeJornada(conJornada);
@@ -74,7 +74,8 @@ export function backtest(partidos, opciones = {}) {
     const { porEquipo, promedioLigaCasa, promedioLigaFuera } = fuerzas(
       partidos,
       fechaCorte,
-      semividaJornadas
+      semividaJornadas,
+      pesoPrior
     );
 
     const fLocal = porEquipo.get(partido.local);

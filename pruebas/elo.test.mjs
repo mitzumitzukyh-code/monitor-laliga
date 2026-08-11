@@ -33,15 +33,40 @@ function ligaSintetica({ filler = 200, doblePartidos = 3 } = {}) {
   return partidos;
 }
 
-test('un equipo que mete el doble del promedio de local da ataqueCasa ≈ 2.0', () => {
+test('un equipo que mete el doble del promedio de local da ataqueCasa ≈ 2.0 (sin suavizado, pesoPrior=0)', () => {
   const partidos = ligaSintetica();
   const fechaCorte = '99999999'; // después de todos los partidos sintéticos
-  // vida media grande para que el decaimiento no distorsione el promedio
-  const { porEquipo, promedioLigaCasa } = fuerzas(partidos, fechaCorte, 1000);
+  // vida media grande para que el decaimiento no distorsione el promedio;
+  // pesoPrior=0 para probar la tasa cruda, sin el empujón bayesiano hacia
+  // el promedio de liga (eso se prueba aparte).
+  const { porEquipo, promedioLigaCasa } = fuerzas(partidos, fechaCorte, 1000, 0);
 
   assert.ok(Math.abs(promedioLigaCasa - 1.0) < 0.02, `promedioLigaCasa=${promedioLigaCasa}`);
   const doble = porEquipo.get('Doble');
   assert.ok(Math.abs(doble.ataqueCasa - 2.0) < 0.05, `ataqueCasa=${doble.ataqueCasa}`);
+});
+
+test('suavizado bayesiano: un equipo con muy pocos partidos queda cerca del promedio de liga (ataqueCasa ≈ 1.0), no en su tasa cruda', () => {
+  // "Doble" solo tiene 1 partido de local (metió 2, el doble del promedio),
+  // pero con pesoPrior alto el suavizado lo empuja hacia 1.0 en vez de 2.0.
+  const partidos = ligaSintetica({ doblePartidos: 1 });
+  const fechaCorte = '99999999';
+  const { porEquipo } = fuerzas(partidos, fechaCorte, 1000, 20); // pesoPrior=20, mucho más que 1 partido real
+
+  const doble = porEquipo.get('Doble');
+  assert.ok(doble.ataqueCasa < 1.2, `ataqueCasa=${doble.ataqueCasa}, debería estar cerca de 1.0 (promedio de liga), no de 2.0`);
+});
+
+test('suavizado bayesiano: un equipo sin ningún partido de local no da NaN ni 0, da ≈1.0 (promedio de liga)', () => {
+  const partidos = ligaSintetica();
+  // "Nuevo" solo juega de visitante, nunca de local, antes del corte.
+  partidos.push({ fecha: '99999998', local: 'A', visitante: 'Nuevo', golesLocal: 1, golesVisitante: 1, temporada: '2024-25' });
+  const fechaCorte = '99999999';
+  const { porEquipo } = fuerzas(partidos, fechaCorte, 1000, 4);
+
+  const nuevo = porEquipo.get('Nuevo');
+  assert.ok(Number.isFinite(nuevo.ataqueCasa), 'no debería dar NaN');
+  assert.ok(Math.abs(nuevo.ataqueCasa - 1.0) < 1e-9, `ataqueCasa=${nuevo.ataqueCasa}, sin partidos de local debe quedar exacto en el promedio de liga`);
 });
 
 test('fuerzas() da resultados idénticos sin importar lo que pase después de fechaCorte (anti-fuga)', () => {
