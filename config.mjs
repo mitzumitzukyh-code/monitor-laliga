@@ -42,21 +42,25 @@ export const JORNADAS_DESCARTADAS = 6;
 //
 // Calibrado con barrido real sobre backtest(partidos, { pesoPrior }),
 // 1600 predicciones, midiendo brierScore/logLoss/porcentajeAcierto de
-// juez/notas.mjs (auditoría Fase 1, ronda 3):
+// juez/notas.mjs. Columna brier con la fórmula OFICIAL (normalizada por
+// K=3, ver PLAN.md) — recalculada en la auditoría de cierre (ronda 4)
+// porque la tabla original (ronda 3) se escribió cuando brierScore()
+// todavía usaba la fórmula sin normalizar; el patrón de comentario
+// desactualizado ya había costado la ronda 3, no se repite dos veces:
 //
 //   pesoPrior   acierto   brier     logLoss   ceros/unos
-//   0           50.56%    0.60269   1.06867   9
-//   1           50.69%    0.59897   1.00372   0
-//   2           50.81%    0.59711   1.00047   0
-//   3           50.94%    0.59610   0.99888   0
-//   4           51.19%    0.59556   0.99807   0   <- elegido
-//   6           51.13%    0.59523   0.99765   0
-//   8           51.00%    0.59544   0.99801   0
-//   12          51.19%    0.59651   0.99970   0
-//   20          50.69%    0.59946   1.00410   0
-//   30          51.00%    0.60316   1.00946   0
-//   60          48.69%    0.61179   1.02164   0
-//   120         47.44%    0.62144   1.03498   0
+//   0           50.56%    0.20090   1.06867   9
+//   1           50.69%    0.19966   1.00372   0
+//   2           50.81%    0.19904   1.00047   0
+//   3           50.94%    0.19870   0.99888   0
+//   4           51.19%    0.19852   0.99807   0   <- elegido
+//   6           51.13%    0.19841   0.99765   0
+//   8           51.00%    0.19848   0.99801   0
+//   12          51.19%    0.19884   0.99970   0
+//   20          50.69%    0.19982   1.00410   0
+//   30          51.00%    0.20105   1.00946   0
+//   60          48.69%    0.20393   1.02164   0
+//   120         47.44%    0.20715   1.03498   0
 //
 // Meseta amplia entre 3 y 12 (todas las métricas casi empatadas); 4 queda
 // cómodo en el medio, ni en el borde donde ceros/unos aparecen de nuevo (0)
