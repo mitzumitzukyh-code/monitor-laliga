@@ -39,44 +39,58 @@ export function grupoDePosicion(posicion) {
   return GRUPO_POR_POSICION[posicion] ?? 'medio';
 }
 
+// Valores por defecto de config.mjs, para poder pasar overrides parciales
+// al calibrar (ver juez/comparar.mjs) sin tocar el archivo de config.
+const COEFICIENTES_DEFECTO = {
+  coefGolPor90: COEF_GOL_POR_90,
+  importanciaBasePosicion: IMPORTANCIA_BASE_POSICION,
+  factorOfensivoPosicion: FACTOR_OFENSIVO_POSICION,
+  factorDefensivoPosicion: FACTOR_DEFENSIVO_POSICION,
+  topeImpactoOfensivo: TOPE_IMPACTO_OFENSIVO,
+  topeImpactoDefensivo: TOPE_IMPACTO_DEFENSIVO,
+};
+
 // Importancia general de un jugador a partir de cuánto juega, su posición y
 // cuánto aporta de gol. jugador = { cuotaMinutos, posicion, golesPor90 }.
-export function pesoAusente(jugador) {
+export function pesoAusente(jugador, coeficientes = {}) {
+  const c = { ...COEFICIENTES_DEFECTO, ...coeficientes };
   const grupo = grupoDePosicion(jugador.posicion);
-  const base = IMPORTANCIA_BASE_POSICION[grupo] ?? IMPORTANCIA_BASE_POSICION.medio;
-  const ajusteGol = 1 + jugador.golesPor90 * COEF_GOL_POR_90;
+  const base = c.importanciaBasePosicion[grupo] ?? c.importanciaBasePosicion.medio;
+  const ajusteGol = 1 + jugador.golesPor90 * c.coefGolPor90;
   return jugador.cuotaMinutos * base * ajusteGol;
 }
 
 // Cuánto golpea el ataque del equipo la lista de ausentes, topado.
-export function impactoOfensivo(ausentes) {
+export function impactoOfensivo(ausentes, coeficientes = {}) {
+  const c = { ...COEFICIENTES_DEFECTO, ...coeficientes };
   let suma = 0;
   for (const jugador of ausentes) {
     const grupo = grupoDePosicion(jugador.posicion);
-    const factor = FACTOR_OFENSIVO_POSICION[grupo] ?? FACTOR_OFENSIVO_POSICION.medio;
-    suma += pesoAusente(jugador) * factor;
+    const factor = c.factorOfensivoPosicion[grupo] ?? c.factorOfensivoPosicion.medio;
+    suma += pesoAusente(jugador, c) * factor;
   }
-  return Math.min(TOPE_IMPACTO_OFENSIVO, suma);
+  return Math.min(c.topeImpactoOfensivo, suma);
 }
 
 // Cuánto golpea la defensa del equipo la lista de ausentes, topado.
-export function impactoDefensivo(ausentes) {
+export function impactoDefensivo(ausentes, coeficientes = {}) {
+  const c = { ...COEFICIENTES_DEFECTO, ...coeficientes };
   let suma = 0;
   for (const jugador of ausentes) {
     const grupo = grupoDePosicion(jugador.posicion);
-    const factor = FACTOR_DEFENSIVO_POSICION[grupo] ?? FACTOR_DEFENSIVO_POSICION.medio;
-    suma += pesoAusente(jugador) * factor;
+    const factor = c.factorDefensivoPosicion[grupo] ?? c.factorDefensivoPosicion.medio;
+    suma += pesoAusente(jugador, c) * factor;
   }
-  return Math.min(TOPE_IMPACTO_DEFENSIVO, suma);
+  return Math.min(c.topeImpactoDefensivo, suma);
 }
 
 // Regla 2: esto modifica los lambdas, nunca los porcentajes finales. La
 // matriz de marcadores se reconstruye después con estos lambdas ajustados.
-export function aplicarAusencias(lh, la, ausentesLocal, ausentesVisitante) {
-  const impactoOfLocal = impactoOfensivo(ausentesLocal);
-  const impactoDefLocal = impactoDefensivo(ausentesLocal);
-  const impactoOfVisitante = impactoOfensivo(ausentesVisitante);
-  const impactoDefVisitante = impactoDefensivo(ausentesVisitante);
+export function aplicarAusencias(lh, la, ausentesLocal, ausentesVisitante, coeficientes = {}) {
+  const impactoOfLocal = impactoOfensivo(ausentesLocal, coeficientes);
+  const impactoDefLocal = impactoDefensivo(ausentesLocal, coeficientes);
+  const impactoOfVisitante = impactoOfensivo(ausentesVisitante, coeficientes);
+  const impactoDefVisitante = impactoDefensivo(ausentesVisitante, coeficientes);
 
   return {
     lh: lh * (1 - impactoOfLocal) * (1 + impactoDefVisitante),

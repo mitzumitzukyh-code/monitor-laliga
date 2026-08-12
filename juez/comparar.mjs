@@ -9,13 +9,28 @@ import { backtest } from './backtest.mjs';
 import { metricas } from './notas.mjs';
 import { estadisticasJugadores, detectarAusentes, aplicarAusencias } from '../motor/ausencias.mjs';
 
-function crearAjusteAusencias(alineaciones) {
+// Agrupar por equipo una sola vez (en vez de filtrar las ~84.000 filas
+// completas en cada partido) es puramente una optimización de velocidad:
+// motor/ausencias.mjs igual vuelve a filtrar por fecha adentro, solo que
+// sobre un array ~26 veces más chico. No cambia qué partidos entran ni el
+// resultado, verificado con pruebas/comparar.test.mjs.
+function crearAjusteAusencias(alineaciones, opcionesAusencias = {}) {
+  const porEquipo = new Map();
+  for (const fila of alineaciones) {
+    if (!porEquipo.has(fila.equipo)) porEquipo.set(fila.equipo, []);
+    porEquipo.get(fila.equipo).push(fila);
+  }
+
   return ({ lh, la, partido, fechaCorte }) => {
-    const statsLocal = estadisticasJugadores(alineaciones, partido.local, fechaCorte);
-    const statsVisitante = estadisticasJugadores(alineaciones, partido.visitante, fechaCorte);
-    const ausentesLocal = detectarAusentes(alineaciones, partido.local, partido.fecha, statsLocal);
-    const ausentesVisitante = detectarAusentes(alineaciones, partido.visitante, partido.fecha, statsVisitante);
-    return aplicarAusencias(lh, la, ausentesLocal, ausentesVisitante);
+    const filasLocal = porEquipo.get(partido.local) ?? [];
+    const filasVisitante = porEquipo.get(partido.visitante) ?? [];
+    const { semividaJornadasJugador, umbralRegular, ...coeficientes } = opcionesAusencias;
+
+    const statsLocal = estadisticasJugadores(filasLocal, partido.local, fechaCorte, semividaJornadasJugador);
+    const statsVisitante = estadisticasJugadores(filasVisitante, partido.visitante, fechaCorte, semividaJornadasJugador);
+    const ausentesLocal = detectarAusentes(filasLocal, partido.local, partido.fecha, statsLocal, umbralRegular);
+    const ausentesVisitante = detectarAusentes(filasVisitante, partido.visitante, partido.fecha, statsVisitante, umbralRegular);
+    return aplicarAusencias(lh, la, ausentesLocal, ausentesVisitante, coeficientes);
   };
 }
 
@@ -23,9 +38,9 @@ function filaTabla(etiqueta, m) {
   return `${etiqueta.padEnd(22)} N=${String(m.n).padEnd(5)} acierto=${(m.acierto * 100).toFixed(1).padStart(5)}%  brier=${m.brier.toFixed(4)}  logLoss=${m.logLoss.toFixed(4)}`;
 }
 
-export async function compararConYSinAusencias(partidos, alineaciones) {
+export async function compararConYSinAusencias(partidos, alineaciones, opcionesAusencias = {}) {
   const sinAjuste = backtest(partidos);
-  const conAjuste = backtest(partidos, { ajustarLambdas: crearAjusteAusencias(alineaciones) });
+  const conAjuste = backtest(partidos, { ajustarLambdas: crearAjusteAusencias(alineaciones, opcionesAusencias) });
   return { sinAjuste, conAjuste };
 }
 
