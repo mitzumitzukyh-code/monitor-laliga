@@ -67,3 +67,59 @@ export const JORNADAS_DESCARTADAS = 6;
 // ni forzando el extremo donde el suavizado ya empieza a emparejar equipos
 // distintos y las métricas empeoran (a partir de ~30).
 export const PESO_PRIOR_PARTIDOS = 4;
+
+// --- Fase 2: ausencias (lesionados y banca) ---
+// Coeficientes de arranque, todavía SIN calibrar contra el backtest — eso
+// es justo lo que decide juez/comparar.mjs (regla 4: se gana el puesto o se
+// bota). Documentar acá desde ya para no repetir el error de Fase 1 de
+// dejar un número sin justificación por escrito.
+
+// Vida media (en partidos jugados del propio jugador, no del equipo) del
+// decaimiento al calcular cuota de minutos y goles por 90 de un jugador.
+// Deliberadamente más corta que SEMIVIDA_JORNADAS (150): la titularidad de
+// un jugador cambia mucho más rápido que la fuerza global de un equipo
+// (lesiones, pérdida de forma, cambio de entrenador).
+export const SEMIVIDA_JORNADAS_JUGADOR = 10;
+
+// Cuota mínima de minutos (0 a 1) para considerar a un jugador "regular".
+// Si un jugador con cuotaMinutos por debajo de esto no arranca, no cuenta
+// como ausencia — nunca fue un titular fijo, no hay nada que "perder".
+export const UMBRAL_MINUTOS_REGULAR = 0.5;
+
+// Cuánto pesa cada gol por 90 minutos extra en la importancia de un
+// jugador (ver motor/ausencias.mjs:pesoAusente).
+export const COEF_GOL_POR_90 = 2.0;
+
+// Importancia base por posición (0 a 1): qué tan "insustituible" es en
+// general un jugador de esa posición, antes de mirar minutos o goles.
+export const IMPORTANCIA_BASE_POSICION = {
+  portero: 0.9,
+  defensa: 0.8,
+  medio: 0.85,
+  delantero: 0.8,
+};
+
+// Qué fracción de la importancia de un jugador ausente golpea el ataque
+// del equipo (impactoOfensivo) según su posición. Un portero ausente casi
+// no afecta el ataque; un delantero, sí y mucho.
+export const FACTOR_OFENSIVO_POSICION = {
+  portero: 0,
+  defensa: 0.15,
+  medio: 0.5,
+  delantero: 1.0,
+};
+
+// Simétrico: qué fracción golpea la defensa (impactoDefensivo).
+export const FACTOR_DEFENSIVO_POSICION = {
+  portero: 1.0,
+  defensa: 1.0,
+  medio: 0.5,
+  delantero: 0.1,
+};
+
+// Tope al impacto total (ofensivo y defensivo) que las ausencias pueden
+// aplicar sobre un lambda, aunque falte todo el equipo titular. Sin este
+// tope, un caso extremo (5+ regulares ausentes) podría desplomar o disparar
+// un lambda a algo absurdo.
+export const TOPE_IMPACTO_OFENSIVO = 0.35;
+export const TOPE_IMPACTO_DEFENSIVO = 0.35;
