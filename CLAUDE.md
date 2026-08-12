@@ -67,9 +67,12 @@ datos/cache/   archivos descargados (en .gitignore)
 |---|---|---|
 | Histórico (5 temporadas) | football-data.co.uk, archivos SP1.csv | gratis, sin llave |
 | Partidos del día | api-sports.io (liga 140) | 100 peticiones/día |
-| Lesionados | api-sports.io `/injuries?league=140&date=` | 1 pedida = liga completa |
-| Alineaciones | api-sports.io `/fixtures/lineups` | 1 por partido, T-40min |
-| Cuotas | api-sports.io `/odds` | solo para comparar, nunca para predecir |
+| Tabla de posiciones | api-sports.io `/standings` | incluido en plan gratis |
+| Cuotas | api-sports.io `/odds` | incluido en plan gratis, solo para comparar, nunca para predecir |
+| ~~Lesionados~~ | ~~api-sports.io `/injuries`~~ | **NO incluido en plan gratis para La Liga** (verificado 2026-08-12: `coverage.injuries: false` para la temporada 2026 vía `/leagues?id=140`). El ajuste de ausencias de Fase 2 ya se había botado por no ganarse el puesto contra el backtest — esto confirma que tampoco tendría de dónde alimentarse en vivo. Requeriría plan de pago (desde Pro, $19/mes) si algún día se retoma. |
+| ~~Alineaciones~~ | ~~api-sports.io `/fixtures/lineups`~~ | **NO incluido en plan gratis para La Liga** (mismo chequeo: `coverage.fixtures.lineups: false`). Mismo límite que arriba. |
+
+Límite real confirmado por headers de la propia API (no asumido): `x-ratelimit-requests-limit: 100` (día), `10` (minuto) — coincide con el presupuesto de la regla 5.
 
 ## Orden de fases
 
