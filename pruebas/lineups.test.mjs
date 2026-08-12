@@ -40,6 +40,30 @@ test('goles y asistencias no son negativos', () => {
   }
 });
 
+test('equipo y esLocal son consistentes: equipo=local cuando esLocal, equipo=visitante si no', () => {
+  for (const f of filas) {
+    if (f.esLocal) {
+      assert.equal(f.equipo, f.local, `fila dice esLocal pero equipo="${f.equipo}" != local="${f.local}"`);
+    } else {
+      assert.equal(f.equipo, f.visitante, `fila dice visitante pero equipo="${f.equipo}" != visitante="${f.visitante}"`);
+    }
+  }
+});
+
+test('cada partido tiene jugadores de ambos equipos (local y visitante), no solo uno', () => {
+  const equiposPorPartido = new Map();
+  for (const f of filas) {
+    const clave = `${f.fecha}|${f.local}|${f.visitante}`;
+    if (!equiposPorPartido.has(clave)) equiposPorPartido.set(clave, new Set());
+    equiposPorPartido.get(clave).add(f.equipo);
+  }
+  let incompletos = 0;
+  for (const equipos of equiposPorPartido.values()) {
+    if (equipos.size < 2) incompletos++;
+  }
+  assert.equal(incompletos, 0, `${incompletos} partidos con jugadores de un solo equipo`);
+});
+
 test('todo partido de alineaciones existe también en el histórico de resultados', () => {
   const clavesHistorico = new Set(historico.map((p) => `${p.temporada}|${p.local}|${p.visitante}`));
   const partidosAlineaciones = new Set(filas.map((f) => `${f.temporada}|${f.local}|${f.visitante}`));
@@ -60,7 +84,7 @@ test('cada equipo titular tiene entre 9 y 13 titulares por partido (formaciones 
   const titularesPorPartidoEquipo = new Map();
   for (const f of filas) {
     if (!f.esTitular) continue;
-    const clave = `${f.fecha}|${f.local}|${f.visitante}|${f.clubId}`;
+    const clave = `${f.fecha}|${f.local}|${f.visitante}|${f.equipo}`;
     titularesPorPartidoEquipo.set(clave, (titularesPorPartidoEquipo.get(clave) ?? 0) + 1);
   }
   let fueraDeRango = 0;

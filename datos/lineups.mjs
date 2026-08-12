@@ -9,7 +9,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { FOOTBALL_DATA_A_TRANSFERMARKT, TRANSFERMARKT_A_FOOTBALL_DATA } from './equipos.mjs';
+import { TRANSFERMARKT_A_FOOTBALL_DATA } from './equipos.mjs';
 
 const BASE_URL = 'https://pub-e682421888d945d684bcae8890b0ec20.r2.dev/data';
 const CACHE_DIR = new URL('./cache/', import.meta.url);
@@ -110,6 +110,8 @@ async function main() {
       temporada: temporadaDesde(g.season),
       local,
       visitante,
+      localClubId: g.home_club_id,
+      visitanteClubId: g.away_club_id,
     });
   }
   console.log(`Partidos de LaLiga 2021-2026 encontrados en games.csv: ${juegosES1.size}`);
@@ -140,17 +142,21 @@ async function main() {
       sinLineup++;
       continue;
     }
-    const equipoLocalTm = FOOTBALL_DATA_A_TRANSFERMARKT[partido.local];
-    // player_club_id no viene mapeado a nombre acá; se infiere local/visitante
-    // comparando contra el club_id que trajo game_lineups.csv para esa fila.
+    const esLocal = lineup.clubId === partido.localClubId;
+    const esVisitante = lineup.clubId === partido.visitanteClubId;
+    if (!esLocal && !esVisitante) {
+      console.warn(`club_id ${lineup.clubId} no coincide con local ni visitante en game_id ${a.game_id}`);
+      continue;
+    }
     filas.push({
       fecha: partido.fecha,
       temporada: partido.temporada,
       local: partido.local,
       visitante: partido.visitante,
+      equipo: esLocal ? partido.local : partido.visitante,
+      esLocal,
       jugadorId: a.player_id,
       jugador: lineup.nombre,
-      clubId: lineup.clubId,
       posicion: lineup.posicion,
       esTitular: lineup.esTitular,
       minutos: Number(a.minutes_played) || 0,
@@ -169,14 +175,18 @@ async function main() {
     if (!partido) continue;
     const clavePartido = `${partido.fecha}|${playerId}`;
     if (vistos.has(clavePartido)) continue;
+    const esLocal = lineup.clubId === partido.localClubId;
+    const esVisitante = lineup.clubId === partido.visitanteClubId;
+    if (!esLocal && !esVisitante) continue;
     filas.push({
       fecha: partido.fecha,
       temporada: partido.temporada,
       local: partido.local,
       visitante: partido.visitante,
+      equipo: esLocal ? partido.local : partido.visitante,
+      esLocal,
       jugadorId: playerId,
       jugador: lineup.nombre,
-      clubId: lineup.clubId,
       posicion: lineup.posicion,
       esTitular: lineup.esTitular,
       minutos: 0,
