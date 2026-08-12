@@ -68,11 +68,34 @@ export const JORNADAS_DESCARTADAS = 6;
 // distintos y las métricas empeoran (a partir de ~30).
 export const PESO_PRIOR_PARTIDOS = 4;
 
-// --- Fase 2: ausencias (lesionados y banca) ---
-// Coeficientes de arranque, todavía SIN calibrar contra el backtest — eso
-// es justo lo que decide juez/comparar.mjs (regla 4: se gana el puesto o se
-// bota). Documentar acá desde ya para no repetir el error de Fase 1 de
-// dejar un número sin justificación por escrito.
+// --- Fase 2: ausencias (lesionados y banca) — AJUSTE BOTADO, NO ACTIVO ---
+// Veredicto de juez/comparar.mjs (regla 4): con los coeficientes de arranque
+// de abajo, el ajuste EMPEORA la nota (acierto 51.2%->50.7%, brier
+// 0.1985->0.1987, logLoss 0.9981->0.9990 sobre las 1600 predicciones reales).
+//
+// Se intentó calibrar antes de botarlo: barrido de 68 combinaciones
+// (umbralRegular x tope de impacto x semividaJornadasJugador x coefGolPor90)
+// sobre el mismo backtest. El mejor punto encontrado (umbralRegular=0.95,
+// tope=0.03, semivida=20) da una mejora de apenas 0.055% relativo en Brier
+// (0.19852 -> 0.19841) y NO es consistente por temporada: mejora en 3 de 5
+// (2021-22, 2023-24, 2024-25) y empeora en las otras 2 (2022-23, 2025-26).
+// Eso es la firma de ruido de haber probado 68 combinaciones sobre el mismo
+// histórico que después se mide (el "mejor de muchos intentos" casi siempre
+// gana por azar, no por señal real) — no de una mejora genuina.
+//
+// Conclusión: el proxy de "quién no arrancó del 11 esperado" (sin saber si
+// fue lesión, descanso o decisión técnica) es demasiado ruidoso con los
+// datos disponibles para mejorar la predicción. El código queda en el repo,
+// probado y documentado (motor/ausencias.mjs, juez/comparar.mjs), pero
+// backtest() NO lo aplica por defecto — hay que pasar ajustarLambdas
+// explícitamente para activarlo, y Fase 3 no debe hacerlo. Si algún día se
+// consigue el motivo real de la ausencia (lesión vs rotación vs suspensión),
+// vale la pena reintentarlo — el problema no fue la fontanería, fue la
+// calidad de la señal.
+//
+// Los coeficientes de abajo quedan como estaban en el barrido (no tiene
+// sentido "calibrarlos más" hacia arriba cuando la conclusión es no usar
+// el ajuste), documentados para quien retome esto más adelante.
 
 // Vida media (en partidos jugados del propio jugador, no del equipo) del
 // decaimiento al calcular cuota de minutos y goles por 90 de un jugador.
