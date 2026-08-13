@@ -66,13 +66,49 @@ datos/cache/   archivos descargados (en .gitignore)
 | Qué | De dónde | Costo |
 |---|---|---|
 | Histórico (5 temporadas) | football-data.co.uk, archivos SP1.csv | gratis, sin llave |
-| Partidos del día | api-sports.io (liga 140) | 100 peticiones/día |
-| Tabla de posiciones | api-sports.io `/standings` | incluido en plan gratis |
-| Cuotas | api-sports.io `/odds` | incluido en plan gratis, solo para comparar, nunca para predecir |
-| ~~Lesionados~~ | ~~api-sports.io `/injuries`~~ | **NO incluido en plan gratis para La Liga** (verificado 2026-08-12: `coverage.injuries: false` para la temporada 2026 vía `/leagues?id=140`). El ajuste de ausencias de Fase 2 ya se había botado por no ganarse el puesto contra el backtest — esto confirma que tampoco tendría de dónde alimentarse en vivo. Requeriría plan de pago (desde Pro, $19/mes) si algún día se retoma. |
-| ~~Alineaciones~~ | ~~api-sports.io `/fixtures/lineups`~~ | **NO incluido en plan gratis para La Liga** (mismo chequeo: `coverage.fixtures.lineups: false`). Mismo límite que arriba. |
+| ~~Partidos del día~~ | ~~api-sports.io (liga 140)~~ | **BLOQUEADO en plan gratis, verificado 2026-08-13 con llamadas reales** — ver aviso abajo |
+| ~~Tabla de posiciones~~ | ~~api-sports.io `/standings`~~ | mismo bloqueo |
+| ~~Cuotas~~ | ~~api-sports.io `/odds`~~ | mismo bloqueo (de todas formas solo para comparar, nunca para predecir) |
+| ~~Lesionados~~ | ~~api-sports.io `/injuries`~~ | **NO incluido en plan gratis para La Liga** (verificado 2026-08-12: `coverage.injuries: false` para la temporada 2026 vía `/leagues?id=140`). El ajuste de ausencias de Fase 2 ya se había botado por no ganarse el puesto contra el backtest. |
+| ~~Alineaciones~~ | ~~api-sports.io `/fixtures/lineups`~~ | **NO incluido en plan gratis para La Liga** (mismo chequeo: `coverage.fixtures.lineups: false`). |
 
-Límite real confirmado por headers de la propia API (no asumido): `x-ratelimit-requests-limit: 100` (día), `10` (minuto) — coincide con el presupuesto de la regla 5.
+Límite real confirmado por headers de la propia API: `x-ratelimit-requests-limit: 100` (día), `10` (minuto) — coincide con el presupuesto de la regla 5. Esto sí es correcto, no es lo que falla.
+
+### ⚠️ AVISO GRAVE (2026-08-13): el plan gratis no da acceso a la temporada 2026-27, punto
+
+La verificación de `coverage` en `/leagues?id=140` (2026-08-12) decía qué existe para esa
+liga en general — **no qué te deja pedir tu plan específico**. Son cosas distintas y se
+confundieron. Con llamadas reales (7 peticiones gastadas, contador real en Supabase):
+
+```
+/fixtures?league=140&season=2026            -> "Free plans do not have access to this
+                                                season, try from 2022 to 2024."
+/standings?league=140&season=2025           -> mismo rechazo
+/fixtures?league=140&date=2026-08-14&season=2026
+                                             -> mismo rechazo, aunque la fecha esté
+                                                dentro de la ventana permitida
+```
+
+El plan gratis de api-sports.io solo da acceso a las temporadas **2022 a 2024** para
+`/fixtures`, `/standings` y `/teams` — nunca a la actual. No hay forma de traer
+partidos del día, tabla de posiciones, ni el roster de equipos de la temporada en
+curso con este plan. `datos/api.mjs` (Fase 3) está escrito y probado (con fetch
+simulado) pero **no puede correr en vivo contra la temporada real hasta resolver
+esto**.
+
+No confirmado con documentación oficial de primera mano (api-football.com devuelve
+403 a fetches automatizados). Evidencia indirecta (búsquedas, la propia página de
+precios del dashboard) sugiere que los planes de pago (desde Pro, $19/mes) sí cubren
+la temporada actual — "la diferencia entre planes es volumen y rango histórico, no
+funcionalidades" — pero **no está verificado con una llamada real**. Antes de pagar,
+preguntar al chat de soporte de api-sports si Pro cubre fixtures/standings/teams de
+la temporada 2026-27.
+
+**Fase 3 en vivo queda en pausa** hasta resolver esto. Lo que sí quedó construido y
+funcionando de verdad, sin depender de este bloqueo: `sql/schema.sql` aplicado a
+Supabase con los GRANT correctos, `datos/supabase.mjs`, y `datos/api.mjs` (contador
+persistido, freno duro, caché, `partidosDelDia()` con persistencia real) — todo
+probado con fetch simulado, cero llamadas reales en los tests.
 
 ## Orden de fases
 
