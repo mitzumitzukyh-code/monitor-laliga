@@ -11,7 +11,7 @@ process.env.SUPABASE_URL = 'https://supabase.test';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'fake-service-key';
 process.env.API_SPORTS_KEY = 'fake-api-sports-key';
 
-const { pedir, contadorHoy, FRENO_DURO } = await import('../datos/api.mjs');
+const { pedir, contadorHoy, partidosDelDia, FRENO_DURO } = await import('../datos/api.mjs');
 
 const fetchOriginal = globalThis.fetch;
 // El caché de pedir() escribe en disco de verdad (datos/cache/api/). Para que
@@ -105,4 +105,70 @@ test('pedir() incrementa el contador en cada llamada real (no en los hits de cac
 
   await pedir('/fixtures', params, { tipo: 'fixtures' }); // esta sale de caché
   assert.equal(await contadorHoy(), 11, 'un hit de caché no debería incrementar el contador');
+});
+
+test('partidosDelDia() normaliza el fixture crudo y guarda equipos + partido en Supabase', async () => {
+  const fixtureCrudo = {
+    fixture: { id: 555111, date: '2099-05-05T20:00:00+00:00', status: { short: 'NS' } },
+    league: { id: 140, season: 2026, round: 'Regular Season - 1' },
+    teams: { home: { id: 1, name: 'Equipo Local' }, away: { id: 2, name: 'Equipo Visitante' } },
+    goals: { home: null, away: null },
+  };
+
+  const upserts = { teams: null, fixtures: null };
+  globalThis.fetch = async (url, opciones = {}) => {
+    const urlStr = String(url);
+    if (urlStr.startsWith('https://supabase.test')) {
+      if (urlStr.includes('/rest/v1/api_usage') && opciones.method === 'POST') {
+        return respuestaJSON(JSON.parse(opciones.body));
+      }
+      if (urlStr.includes('/rest/v1/api_usage')) return respuestaJSON([{ requests_used: 0 }]);
+      if (urlStr.includes('/rest/v1/fixtures') && opciones.method === 'POST') {
+        upserts.fixtures = JSON.parse(opciones.body);
+        return respuestaJSON(upserts.fixtures);
+      }
+      if (urlStr.includes('/rest/v1/fixtures')) return respuestaJSON([]); // nada guardado todavía
+      if (urlStr.includes('/rest/v1/teams') && opciones.method === 'POST') {
+        upserts.teams = JSON.parse(opciones.body);
+        return respuestaJSON(upserts.teams);
+      }
+      return respuestaJSON([]);
+    }
+    return respuestaJSON({ response: [fixtureCrudo], errors: [] });
+  };
+
+  const resultado = await partidosDelDia('2099-05-05');
+
+  assert.equal(resultado.length, 1);
+  assert.equal(resultado[0].id, 555111);
+  assert.equal(resultado[0].home_team_id, 1);
+  assert.equal(resultado[0].away_team_id, 2);
+  assert.equal(resultado[0].status, 'NS');
+  assert.equal(resultado[0].season, 2026);
+
+  assert.deepEqual(upserts.teams, [
+    { id: 1, name: 'Equipo Local' },
+    { id: 2, name: 'Equipo Visitante' },
+  ]);
+  assert.equal(upserts.fixtures.length, 1);
+  assert.equal(upserts.fixtures[0].id, 555111);
+});
+
+test('partidosDelDia() no pide nada a api-sports si ya están todos guardados con status FT', async () => {
+  let llamoApiSports = false;
+  globalThis.fetch = async (url, opciones = {}) => {
+    const urlStr = String(url);
+    if (urlStr.startsWith('https://supabase.test')) {
+      if (urlStr.includes('/rest/v1/fixtures')) {
+        return respuestaJSON([{ id: 1, status: 'FT' }, { id: 2, status: 'FT' }]);
+      }
+      return respuestaJSON([]);
+    }
+    llamoApiSports = true;
+    return respuestaJSON({ response: [], errors: [] });
+  };
+
+  const resultado = await partidosDelDia('2099-06-06');
+  assert.equal(llamoApiSports, false, 'todos los partidos ya estaban FT, no debía pedir nada');
+  assert.equal(resultado.length, 2);
 });

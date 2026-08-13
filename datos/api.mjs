@@ -14,6 +14,7 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { seleccionar, upsert } from './supabase.mjs';
 
 const BASE_URL = 'https://v3.football.api-sports.io';
@@ -106,8 +107,33 @@ export async function pedir(endpoint, params = {}, { tipo, ttlHoras } = {}) {
 
 // --- Helpers de alto nivel, uno por tipo de dato que sí cubre el plan ---
 
+function normalizarFixture(f) {
+  return {
+    id: f.fixture.id,
+    league_id: f.league.id,
+    season: f.league.season,
+    round: f.league.round,
+    date: f.fixture.date,
+    home_team_id: f.teams.home.id,
+    away_team_id: f.teams.away.id,
+    home_goals: f.goals.home,
+    away_goals: f.goals.away,
+    status: f.fixture.status.short,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function equiposDeFixture(f) {
+  return [
+    { id: f.teams.home.id, name: f.teams.home.name },
+    { id: f.teams.away.id, name: f.teams.away.name },
+  ];
+}
+
 // Partidos del día. Si ya están todos en Supabase con status 'FT' (jugados),
-// no hace falta volver a pedirle nada a la API — ya no van a cambiar.
+// no hace falta volver a pedirle nada a la API — ya no van a cambiar. Si hay
+// que pedirlos, los normaliza al esquema de sql/schema.sql y los deja
+// guardados en Supabase (equipos primero, por la FK de fixtures).
 export async function partidosDelDia(fecha) {
   const guardados = await seleccionar(
     'fixtures',
@@ -117,7 +143,16 @@ export async function partidosDelDia(fecha) {
   const todosTerminados = hayAlgoGuardado && guardados.every((f) => f.status === 'FT');
   if (todosTerminados) return guardados;
 
-  return pedir('/fixtures', { league: LEAGUE_ID, date: fecha }, { tipo: 'fixtures' });
+  const crudos = await pedir('/fixtures', { league: LEAGUE_ID, date: fecha }, { tipo: 'fixtures' });
+  if (crudos.length === 0) return [];
+
+  const equipos = crudos.flatMap(equiposDeFixture);
+  const fixturesNormalizados = crudos.map(normalizarFixture);
+
+  await upsert('teams', equipos, { onConflict: 'id' });
+  await upsert('fixtures', fixturesNormalizados, { onConflict: 'id' });
+
+  return fixturesNormalizados;
 }
 
 export async function tablaPosiciones(temporadaApiSports) {
@@ -128,4 +163,19 @@ export async function tablaPosiciones(temporadaApiSports) {
 // para predecir).
 export async function cuotas(fixtureId) {
   return pedir('/odds', { fixture: fixtureId }, { tipo: 'odds' });
+}
+
+// CLI para el flujo n8n/01-partidos.json: node datos/api.mjs [fecha AAAA-MM-DD]
+async function main() {
+  const fecha = process.argv[2] || new Date().toISOString().slice(0, 10);
+  const partidos = await partidosDelDia(fecha);
+  console.log(JSON.stringify({ fecha, partidos: partidos.length, contador: await contadorHoy() }));
+}
+
+const esEjecutadoDirectamente = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (esEjecutadoDirectamente) {
+  main().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
 }
