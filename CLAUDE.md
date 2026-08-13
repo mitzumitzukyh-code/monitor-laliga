@@ -66,49 +66,51 @@ datos/cache/   archivos descargados (en .gitignore)
 | Qué | De dónde | Costo |
 |---|---|---|
 | Histórico (5 temporadas) | football-data.co.uk, archivos SP1.csv | gratis, sin llave |
-| ~~Partidos del día~~ | ~~api-sports.io (liga 140)~~ | **BLOQUEADO en plan gratis, verificado 2026-08-13 con llamadas reales** — ver aviso abajo |
-| ~~Tabla de posiciones~~ | ~~api-sports.io `/standings`~~ | mismo bloqueo |
-| ~~Cuotas~~ | ~~api-sports.io `/odds`~~ | mismo bloqueo (de todas formas solo para comparar, nunca para predecir) |
-| ~~Lesionados~~ | ~~api-sports.io `/injuries`~~ | **NO incluido en plan gratis para La Liga** (verificado 2026-08-12: `coverage.injuries: false` para la temporada 2026 vía `/leagues?id=140`). El ajuste de ausencias de Fase 2 ya se había botado por no ganarse el puesto contra el backtest. |
-| ~~Alineaciones~~ | ~~api-sports.io `/fixtures/lineups`~~ | **NO incluido en plan gratis para La Liga** (mismo chequeo: `coverage.fixtures.lineups: false`). |
+| Partidos del día | football-data.org `/v4/competitions/PD/matches` | gratis, con token, 10 peticiones/minuto |
+| Tabla de posiciones | football-data.org `/v4/competitions/PD/standings` | gratis, con token |
+| ~~Cuotas~~ | — | Sin fuente gratis conocida. No es crítico, solo se usaba para comparar, nunca para predecir. |
+| ~~Lesionados~~ | — | No incluido en ningún plan gratis probado (ni api-sports ni football-data.org). El ajuste de ausencias de Fase 2 ya se había botado por no ganarse el puesto contra el backtest. |
+| ~~Alineaciones~~ | — | Mismo límite que lesionados. |
 
-Límite real confirmado por headers de la propia API: `x-ratelimit-requests-limit: 100` (día), `10` (minuto) — coincide con el presupuesto de la regla 5. Esto sí es correcto, no es lo que falla.
+### api-sports.io — descartado para "en vivo" (2026-08-13)
 
-### ⚠️ AVISO GRAVE (2026-08-13): el plan gratis no da acceso a la temporada 2026-27, punto
+Se probó primero con api-sports.io. Con llamadas reales se confirmó que su plan
+gratis **solo da acceso a las temporadas 2022 a 2024** para `/fixtures`, `/standings`
+y `/teams` — nunca a la temporada actual, ni siquiera con la fecha dentro de la
+ventana permitida (`"Free plans do not have access to this season, try from 2022 to
+2024"`). El chequeo de `coverage` en `/leagues?id=140` (que sí mostraba banderas en
+`true` para 2026) describe qué existe para la liga en general, no qué te deja pedir
+el plan — son cosas distintas, y confundirlas costó una ronda completa de trabajo.
+No confirmado si un plan de pago (Pro, $19/mes) lo resuelve — quedó sin probar porque
+se encontró una alternativa gratis que sí funciona.
 
-La verificación de `coverage` en `/leagues?id=140` (2026-08-12) decía qué existe para esa
-liga en general — **no qué te deja pedir tu plan específico**. Son cosas distintas y se
-confundieron. Con llamadas reales (7 peticiones gastadas, contador real en Supabase):
+### football-data.org — fuente en vivo actual, verificada con llamadas reales (2026-08-13)
 
-```
-/fixtures?league=140&season=2026            -> "Free plans do not have access to this
-                                                season, try from 2022 to 2024."
-/standings?league=140&season=2025           -> mismo rechazo
-/fixtures?league=140&date=2026-08-14&season=2026
-                                             -> mismo rechazo, aunque la fecha esté
-                                                dentro de la ventana permitida
-```
+Registro gratis, sin tarjeta, token instantáneo por correo. Verificado con llamadas
+reales (no solo documentación):
 
-El plan gratis de api-sports.io solo da acceso a las temporadas **2022 a 2024** para
-`/fixtures`, `/standings` y `/teams` — nunca a la actual. No hay forma de traer
-partidos del día, tabla de posiciones, ni el roster de equipos de la temporada en
-curso con este plan. `datos/api.mjs` (Fase 3) está escrito y probado (con fetch
-simulado) pero **no puede correr en vivo contra la temporada real hasta resolver
-esto**.
+- `/v4/competitions/PD` → 200, temporada real 2026-27 (`currentSeason` con
+  `startDate: 2026-08-16`)
+- `/v4/competitions/PD/matches?matchday=1` → 200, los 10 partidos reales de la
+  jornada 1 con los 20 equipos reales de la temporada
+- `partidosDelDia('2026-08-15')` end-to-end contra Supabase real → guardó 4 equipos
+  y 2 partidos reales, verificado con un select posterior
 
-No confirmado con documentación oficial de primera mano (api-football.com devuelve
-403 a fetches automatizados). Evidencia indirecta (búsquedas, la propia página de
-precios del dashboard) sugiere que los planes de pago (desde Pro, $19/mes) sí cubren
-la temporada actual — "la diferencia entre planes es volumen y rango histórico, no
-funcionalidades" — pero **no está verificado con una llamada real**. Antes de pagar,
-preguntar al chat de soporte de api-sports si Pro cubre fixtures/standings/teams de
-la temporada 2026-27.
+Límite real: **10 peticiones por minuto**, sin tope diario documentado (a diferencia
+de api-sports). Sin lineups/injuries/odds en el plan gratis (igual que api-sports).
 
-**Fase 3 en vivo queda en pausa** hasta resolver esto. Lo que sí quedó construido y
-funcionando de verdad, sin depender de este bloqueo: `sql/schema.sql` aplicado a
-Supabase con los GRANT correctos, `datos/supabase.mjs`, y `datos/api.mjs` (contador
-persistido, freno duro, caché, `partidosDelDia()` con persistencia real) — todo
-probado con fetch simulado, cero llamadas reales en los tests.
+Tres equipos de la temporada 2026-27 no tienen ninguna fila en el histórico de Fase 0
+(nunca estuvieron en las últimas 5 temporadas): Racing de Santander, Deportivo de La
+Coruña y Málaga — recién ascendidos o de vuelta. El suavizado bayesiano de
+`motor/elo.mjs` (`PESO_PRIOR_PARTIDOS`) ya maneja este caso sin romperse. Ver
+`datos/equipos-vivo.mjs` para el mapeo de nombres (football-data.org ↔ nombre corto
+canónico que usa el motor desde Fase 0).
+
+**Fase 3 en vivo sigue adelante sobre esta fuente.** `datos/api.mjs` fue reescrito
+para football-data.org (antes apuntaba a api-sports), con `sql/schema.sql` ajustado
+(`league_id` default 2014, antes 140). Todo probado con fetch simulado en los tests
+automáticos, y verificado además con llamadas reales puntuales (no en cada corrida
+de `node --test`, por presupuesto).
 
 ## Orden de fases
 
@@ -122,8 +124,8 @@ Fase 5  web
 ```
 
 **No adelantar fases.** No escribir la web antes de que el motor pase la prueba.
-No tocar api-sports en Fase 0 ni 1. Si el usuario pide saltar, recordarle el
-orden y preguntar si de verdad quiere saltarlo.
+No tocar la fuente en vivo (football-data.org) en Fase 0 ni 1. Si el usuario pide
+saltar, recordarle el orden y preguntar si de verdad quiere saltarlo.
 
 ## Secretos
 

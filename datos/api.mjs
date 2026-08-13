@@ -1,33 +1,48 @@
-// Cliente de api-sports.io (Fase 3). Regla 5 al pie de la letra:
-//   - Nunca pide algo que ya está guardado en Supabase y sigue vigente.
-//   - Contador de peticiones del día persistido en Supabase (compartido con
-//     desarrollo — si corro un script a mano, cuenta igual que n8n).
-//   - Freno duro a 80 peticiones (deja 20 de reserva sobre el límite real de
-//     100/día, verificado por headers en la auditoría de Fase 3).
-//   - Caché en disco con vencimiento por tipo de dato, para no volver a
-//     pedir dentro de la misma ventana de vigencia.
+// Cliente de football-data.org (Fase 3). Reemplaza a api-sports.io — el
+// plan gratis de api-sports NO da acceso a la temporada actual (verificado
+// 2026-08-13 con llamadas reales, ver CLAUDE.md). football-data.org SÍ,
+// verificado el mismo día con una llamada real a /v4/competitions/PD
+// (temporada 2026-27 real, matchday 1 con los 20 equipos reales).
 //
-// Cobertura real del plan gratis para LaLiga (liga 140), verificada contra
-// /leagues?id=140 el 2026-08-12: fixtures y standings y odds SÍ; lineups e
-// injuries NO (ver CLAUDE.md). Por eso este cliente no tiene función para
-// esos dos endpoints — pedirlos solo daría un 403/plan restringido.
+// Límite real del plan gratis: 10 peticiones por minuto. No hay tope diario
+// documentado (a diferencia de api-sports) — igual se cuenta el uso diario
+// en Supabase por disciplina y visibilidad, pero el freno que de verdad
+// aplica es por minuto.
+//
+// Regla 5 sigue al pie de la letra: caché en disco con TTL por tipo de
+// dato, nunca pedir lo que ya está guardado en Supabase y sigue vigente.
+//
+// No hay endpoint de cuotas en esta fuente (football-data.org no las
+// ofrece) — se pierde esa comparación, nunca fue el núcleo del proyecto.
+// Tampoco hay lineups/injuries en el plan gratis, igual que con api-sports.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { seleccionar, upsert } from './supabase.mjs';
+import { VIVO_A_CORTO } from './equipos-vivo.mjs';
 
-const BASE_URL = 'https://v3.football.api-sports.io';
-const LEAGUE_ID = 140; // LaLiga
+const BASE_URL = 'https://api.football-data.org/v4';
+const COMPETITION_CODE = 'PD'; // Primera División — verificado real, no asumido
+const COMPETITION_ID = 2014; // id numérico de football-data.org, solo para la columna league_id
 const CACHE_DIR = new URL('./cache/api/', import.meta.url);
 
-export const FRENO_DURO = 80; // de 100/día reales; deja 20 de reserva
+export const FRENO_POR_MINUTO = 8; // de 10 reales/minuto, deja 2 de reserva
 
 const TTL_HORAS_POR_TIPO = {
-  fixtures: 6,
+  partidos: 6,
   standings: 12,
-  odds: 6,
 };
+
+// Ventana deslizante de 60s en memoria. Cada corrida de n8n es un proceso
+// nuevo (Execute Command), así que esto alcanza — no hace falta persistirlo
+// como el contador diario.
+let peticionesUltimoMinuto = [];
+
+function limpiarVentana() {
+  const ahora = Date.now();
+  peticionesUltimoMinuto = peticionesUltimoMinuto.filter((t) => ahora - t < 60_000);
+}
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10);
@@ -72,82 +87,97 @@ async function guardarCache(tipo, params, datos) {
   );
 }
 
-// Pide un endpoint de api-sports respetando caché, freno duro y contador.
-// tipo/ttlHoras activan el cacheo en disco; sin tipo, siempre pide en vivo
-// (para endpoints que cambian a cada momento y no tiene sentido cachear).
+// Pide un endpoint de football-data.org respetando caché y el freno por
+// minuto. tipo/ttlHoras activan el cacheo en disco.
 export async function pedir(endpoint, params = {}, { tipo, ttlHoras } = {}) {
   if (tipo) {
     const enCache = await leerCache(tipo, params, ttlHoras ?? TTL_HORAS_POR_TIPO[tipo] ?? 6);
     if (enCache !== null) return enCache;
   }
 
-  const usado = await contadorHoy();
-  if (usado >= FRENO_DURO) {
-    throw new Error(`Freno duro: ${usado}/${FRENO_DURO} peticiones usadas hoy. No se pide "${endpoint}".`);
+  limpiarVentana();
+  if (peticionesUltimoMinuto.length >= FRENO_POR_MINUTO) {
+    throw new Error(
+      `Freno por minuto: ${peticionesUltimoMinuto.length}/${FRENO_POR_MINUTO} peticiones en los últimos 60s. No se pide "${endpoint}".`
+    );
   }
 
-  const key = process.env.API_SPORTS_KEY;
-  if (!key) throw new Error('Falta API_SPORTS_KEY en .env');
+  const token = process.env.FOOTBALL_DATA_ORG_TOKEN;
+  if (!token) throw new Error('Falta FOOTBALL_DATA_ORG_TOKEN en .env');
 
   const url = new URL(`${BASE_URL}${endpoint}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
 
-  const res = await fetch(url, { headers: { 'x-apisports-key': key } });
+  const res = await fetch(url, { headers: { 'X-Auth-Token': token } });
+  peticionesUltimoMinuto.push(Date.now());
   await incrementarContador();
 
-  if (!res.ok) throw new Error(`api-sports ${endpoint}: HTTP ${res.status}`);
-  const data = await res.json();
-  if (data.errors && (Array.isArray(data.errors) ? data.errors.length : Object.keys(data.errors).length)) {
-    throw new Error(`api-sports ${endpoint}: ${JSON.stringify(data.errors)}`);
+  if (!res.ok) {
+    const cuerpo = await res.text();
+    throw new Error(`football-data.org ${endpoint}: HTTP ${res.status} ${cuerpo}`);
   }
+  const data = await res.json();
 
-  if (tipo) await guardarCache(tipo, params, data.response);
-  return data.response;
+  if (tipo) await guardarCache(tipo, params, data);
+  return data;
 }
 
-// --- Helpers de alto nivel, uno por tipo de dato que sí cubre el plan ---
+// --- Normalización al esquema de sql/schema.sql ---
 
-function normalizarFixture(f) {
+function nombreCorto(equipoVivo) {
+  return VIVO_A_CORTO.get(equipoVivo.name) ?? equipoVivo.name;
+}
+
+function normalizarPartido(m) {
   return {
-    id: f.fixture.id,
-    league_id: f.league.id,
-    season: f.league.season,
-    round: f.league.round,
-    date: f.fixture.date,
-    home_team_id: f.teams.home.id,
-    away_team_id: f.teams.away.id,
-    home_goals: f.goals.home,
-    away_goals: f.goals.away,
-    status: f.fixture.status.short,
+    id: m.id,
+    league_id: COMPETITION_ID,
+    season: new Date(m.season.startDate).getFullYear(),
+    round: m.matchday ? `Matchday ${m.matchday}` : null,
+    date: m.utcDate,
+    home_team_id: m.homeTeam.id,
+    away_team_id: m.awayTeam.id,
+    home_goals: m.score.fullTime.home,
+    away_goals: m.score.fullTime.away,
+    status: m.status,
     updated_at: new Date().toISOString(),
   };
 }
 
-function equiposDeFixture(f) {
+function equiposDePartido(m) {
   return [
-    { id: f.teams.home.id, name: f.teams.home.name },
-    { id: f.teams.away.id, name: f.teams.away.name },
+    { id: m.homeTeam.id, name: nombreCorto(m.homeTeam) },
+    { id: m.awayTeam.id, name: nombreCorto(m.awayTeam) },
   ];
 }
 
-// Partidos del día. Si ya están todos en Supabase con status 'FT' (jugados),
-// no hace falta volver a pedirle nada a la API — ya no van a cambiar. Si hay
-// que pedirlos, los normaliza al esquema de sql/schema.sql y los deja
-// guardados en Supabase (equipos primero, por la FK de fixtures).
+function sinDuplicados(equipos) {
+  return [...new Map(equipos.map((e) => [e.id, e])).values()];
+}
+
+// --- Helpers de alto nivel ---
+
+// Partidos de un día. Si ya están todos en Supabase con status FINISHED, no
+// hace falta volver a pedirle nada a la fuente — ya no van a cambiar.
 export async function partidosDelDia(fecha) {
   const guardados = await seleccionar(
     'fixtures',
     `date=gte.${fecha}T00:00:00&date=lte.${fecha}T23:59:59&select=id,status`
   );
   const hayAlgoGuardado = guardados.length > 0;
-  const todosTerminados = hayAlgoGuardado && guardados.every((f) => f.status === 'FT');
+  const todosTerminados = hayAlgoGuardado && guardados.every((f) => f.status === 'FINISHED');
   if (todosTerminados) return guardados;
 
-  const crudos = await pedir('/fixtures', { league: LEAGUE_ID, date: fecha }, { tipo: 'fixtures' });
+  const data = await pedir(
+    `/competitions/${COMPETITION_CODE}/matches`,
+    { dateFrom: fecha, dateTo: fecha },
+    { tipo: 'partidos', ttlHoras: 6 }
+  );
+  const crudos = data.matches ?? [];
   if (crudos.length === 0) return [];
 
-  const equipos = crudos.flatMap(equiposDeFixture);
-  const fixturesNormalizados = crudos.map(normalizarFixture);
+  const equipos = sinDuplicados(crudos.flatMap(equiposDePartido));
+  const fixturesNormalizados = crudos.map(normalizarPartido);
 
   await upsert('teams', equipos, { onConflict: 'id' });
   await upsert('fixtures', fixturesNormalizados, { onConflict: 'id' });
@@ -155,14 +185,18 @@ export async function partidosDelDia(fecha) {
   return fixturesNormalizados;
 }
 
-export async function tablaPosiciones(temporadaApiSports) {
-  return pedir('/standings', { league: LEAGUE_ID, season: temporadaApiSports }, { tipo: 'standings' });
-}
-
-// Solo para comparar contra la nota del modelo (regla del proyecto: nunca
-// para predecir).
-export async function cuotas(fixtureId) {
-  return pedir('/odds', { fixture: fixtureId }, { tipo: 'odds' });
+// Tabla de posiciones actual, con nombres ya llevados al corto canónico.
+export async function tablaPosiciones() {
+  const data = await pedir(`/competitions/${COMPETITION_CODE}/standings`, {}, { tipo: 'standings', ttlHoras: 12 });
+  const tabla = data.standings?.find((s) => s.type === 'TOTAL')?.table ?? [];
+  return tabla.map((t) => ({
+    equipo: nombreCorto(t.team),
+    posicion: t.position,
+    jugados: t.playedGames,
+    puntos: t.points,
+    golesFavor: t.goalsFor,
+    golesContra: t.goalsAgainst,
+  }));
 }
 
 // CLI para el flujo n8n/01-partidos.json: node datos/api.mjs [fecha AAAA-MM-DD]

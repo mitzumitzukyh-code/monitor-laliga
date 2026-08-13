@@ -10,15 +10,17 @@
 -- Supabase), no en camelCase como el resto del proyecto en JS.
 
 -- ============================================================
--- teams — catálogo de equipos, id = team id de api-sports.
+-- teams — catálogo de equipos, id = team id de football-data.org.
+-- name guarda el nombre CORTO canónico (mismo que usa el motor desde
+-- Fase 0, ver datos/equipos-vivo.mjs) para que cruzar con el histórico de
+-- football-data.co.uk sea directo, sin traducir nombres en cada consulta.
 -- ============================================================
 create table if not exists teams (
-  id integer primary key,                 -- team_id de api-sports
-  name text not null,                      -- nombre completo (api-sports)
+  id integer primary key,                 -- team id de football-data.org
+  name text not null,                      -- nombre corto canónico (ver datos/equipos-vivo.mjs)
   name_fd text,                            -- nombre corto de football-data.co.uk
-                                            -- (ver datos/equipos.mjs), nulo si
-                                            -- el equipo nunca apareció en el
-                                            -- histórico (recién ascendido)
+                                            -- (histórico), nulo si el equipo
+                                            -- nunca apareció ahí (recién ascendido)
   created_at timestamptz not null default now()
 );
 
@@ -26,10 +28,10 @@ create table if not exists teams (
 -- fixtures — un partido de LaLiga, en vivo o histórico.
 -- ============================================================
 create table if not exists fixtures (
-  id bigint primary key,                   -- fixture_id de api-sports
-  league_id integer not null default 140,  -- LaLiga
+  id bigint primary key,                   -- match id de football-data.org
+  league_id integer not null default 2014, -- LaLiga (competición PD en football-data.org)
   season integer not null,                 -- año de inicio (ej. 2026 = 2026-27)
-  round text,                              -- texto crudo de api-sports
+  round text,                              -- "Matchday N"
   date timestamptz not null,
   home_team_id integer not null references teams(id),
   away_team_id integer not null references teams(id),
@@ -166,3 +168,11 @@ grant select, insert, update, delete on
 grant usage, select on all sequences in schema public to service_role;
 
 grant select on teams, fixtures, lineups, absences, predictions, calibration to anon;
+
+-- ============================================================
+-- Fase 3, cambio de fuente en vivo (2026-08-13): api-sports.io -> football-
+-- data.org. El default de league_id se puso pensando en api-sports (140);
+-- se corrige acá porque CREATE TABLE IF NOT EXISTS no toca columnas de una
+-- tabla que ya existe. No afecta datos reales (la tabla estaba vacía).
+-- ============================================================
+alter table fixtures alter column league_id set default 2014;
