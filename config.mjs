@@ -146,3 +146,11 @@ export const FACTOR_DEFENSIVO_POSICION = {
 // un lambda a algo absurdo.
 export const TOPE_IMPACTO_OFENSIVO = 0.35;
 export const TOPE_IMPACTO_DEFENSIVO = 0.35;
+
+// --- Fase 4: mensajes de Discord ---
+
+// mensajeAlineacion() solo avisa si el cambio en alguna de las tres
+// probabilidades (local/empate/visitante) pasa este umbral. 0.03 = 3 puntos
+// porcentuales, tal cual lo pide PLAN.md ("solo si cambió más de 3 puntos").
+// Un cambio menor no vale una notificación — sería ruido.
+export const UMBRAL_CAMBIO_ALINEACION = 0.03;
