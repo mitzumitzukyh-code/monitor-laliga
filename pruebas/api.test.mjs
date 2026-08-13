@@ -13,9 +13,15 @@ process.env.FOOTBALL_DATA_ORG_TOKEN = 'fake-football-data-org-token';
 const { pedir, contadorHoy, partidosDelDia, tablaPosiciones, FRENO_POR_MINUTO } = await import('../datos/api.mjs');
 
 const fetchOriginal = globalThis.fetch;
-// El caché de pedir() escribe en disco de verdad (datos/cache/api/). Cada
-// clave de caché lleva una marca única de esta corrida para no chocar con
-// una corrida anterior.
+// El caché de pedir() escribe en disco de verdad (datos/cache/api/). Se
+// limpia ANTES de correr las pruebas (no solo después) — si alguien corrió
+// un script real (ej. datos/cli-contexto.mjs) antes de las pruebas, esa
+// caché real quedaría pisando el mock de tablaPosiciones(), que no acepta
+// parámetros para llevar una marca única de corrida como el resto.
+await rm(new URL('../datos/cache/api/', import.meta.url), { recursive: true, force: true });
+
+// Cada clave de caché lleva una marca única de esta corrida para no chocar
+// con una corrida anterior (para los casos que sí aceptan parámetros).
 const marcaCorrida = `test${Date.now()}`;
 
 function respuestaJSON(obj) {
