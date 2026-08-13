@@ -1,0 +1,51 @@
+{
+  "name": "03-fuerzas",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 03-fuerzas\nDiagnóstico: imprime en el log las fuerzas de ataque/defensa de los equipos que juegan hoy. No persiste nada -- 04-motor recalcula esto mismo internamente al predecir (barato, mismo patrón que juez/backtest.mjs). Este flujo es solo para poder auditar sin ir a leer la base.",
+        "height": 220,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a30003-0003-4003-8003-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "a1a30003-0003-4003-8003-000000000002",
+      "name": "Trigger diario"
+    },
+    {
+      "parameters": {
+        "command": "node --env-file=\"D:\\web 2\\.env\" \"D:\\web 2\\juez\\cli-fuerzas.mjs\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "id": "a1a30003-0003-4003-8003-000000000003",
+      "name": "Diagnóstico de fuerzas"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger diario": {
+      "main": [
+        [{ "node": "Diagnóstico de fuerzas", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

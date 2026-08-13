@@ -1,0 +1,47 @@
+{
+  "name": "99-errores",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 99-errores\nFlujo de error central: configurar como \"Error Workflow\" en la pestaña Settings de CADA uno de los otros 6 flujos (no se puede hacer desde este JSON -- el ID de este workflow lo asigna n8n al importarlo).\n\nSin webhook de Discord todavía (Fase 4 sin conectar) -- por ahora solo imprime el mensaje formateado, que queda en el log de ejecución de n8n.\n\nOJO: los nombres exactos de campo del Error Trigger ({{$json.workflow.name}}, {{$json.execution.lastNodeExecuted}}, {{$json.execution.error.message}}) no se pudieron verificar en vivo esta sesión -- correr una ejecución de prueba y ajustar si no coinciden.",
+        "height": 280,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a90009-0009-4009-8009-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "a1a90009-0009-4009-8009-000000000002",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "command": "node --env-file=\"D:\\web 2\\.env\" \"D:\\web 2\\salida\\cli-log-error.mjs\" \"{{$json.workflow.name}}\" \"{{$json.execution.lastNodeExecuted}}\" \"{{$json.execution.error.message}}\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "id": "a1a90009-0009-4009-8009-000000000003",
+      "name": "Registrar error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [{ "node": "Registrar error", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

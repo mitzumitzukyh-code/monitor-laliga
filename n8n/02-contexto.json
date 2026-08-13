@@ -1,0 +1,51 @@
+{
+  "name": "02-contexto",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 02-contexto\nTabla de posiciones actual (football-data.org). No se persiste en Supabase -- no hay tabla para esto en sql/schema.sql, se cachea en disco (datos/cache/api/) con TTL de 12 horas.\n\nCorre después de 01-partidos.",
+        "height": 200,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a20002-0002-4002-8002-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "a1a20002-0002-4002-8002-000000000002",
+      "name": "Trigger diario"
+    },
+    {
+      "parameters": {
+        "command": "node --env-file=\"D:\\web 2\\.env\" \"D:\\web 2\\datos\\cli-contexto.mjs\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "id": "a1a20002-0002-4002-8002-000000000003",
+      "name": "Tabla de posiciones"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger diario": {
+      "main": [
+        [{ "node": "Tabla de posiciones", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

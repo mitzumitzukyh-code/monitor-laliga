@@ -1,0 +1,51 @@
+{
+  "name": "04-motor",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 04-motor\nEl que de verdad predice: fuerzas + lambdas + probabilidades (Dixon-Coles, Fase 1) para los partidos del día, guardado en predictions. Sin el ajuste de ausencias -- se botó en Fase 2 por no ganarse el puesto contra el backtest.\n\nCorre después de 01-partidos.",
+        "height": 220,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a40004-0004-4004-8004-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "a1a40004-0004-4004-8004-000000000002",
+      "name": "Trigger diario"
+    },
+    {
+      "parameters": {
+        "command": "node --env-file=\"D:\\web 2\\.env\" \"D:\\web 2\\juez\\vivo-motor.mjs\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "id": "a1a40004-0004-4004-8004-000000000003",
+      "name": "Predecir partidos del día"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger diario": {
+      "main": [
+        [{ "node": "Predecir partidos del día", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

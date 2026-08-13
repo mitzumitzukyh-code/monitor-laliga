@@ -1,0 +1,35 @@
+{
+  "name": "05-alineaciones",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 05-alineaciones -- INACTIVO A PROPÓSITO\n\nNi api-sports.io ni football-data.org dan lineups/injuries en su plan gratis para LaLiga (verificado con llamadas reales, ver CLAUDE.md). No hay fuente de datos para este flujo todavía.\n\nEl ajuste de ausencias (motor/ausencias.mjs) ya se había botado en Fase 2 por no ganarse el puesto contra el backtest -- tampoco haría falta activarlo aunque hubiera datos.\n\nQueda la estructura lista (tablas lineups/absences en sql/schema.sql) para cuando exista una fuente real. No activar este flujo hasta entonces.",
+        "height": 320,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a50005-0005-4005-8005-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "a1a50005-0005-4005-8005-000000000002",
+      "name": "Trigger diario (sin usar)"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

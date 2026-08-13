@@ -1,0 +1,51 @@
+{
+  "name": "01-partidos",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 01-partidos\nBaja los partidos del día desde football-data.org y los guarda en Supabase (teams + fixtures). No pide nada que ya esté guardado y terminado (regla 5).\n\nAjustar la hora del trigger después de importar (queda en medianoche por defecto).",
+        "height": 220,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a10001-0001-4001-8001-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "a1a10001-0001-4001-8001-000000000002",
+      "name": "Trigger diario"
+    },
+    {
+      "parameters": {
+        "command": "node --env-file=\"D:\\web 2\\.env\" \"D:\\web 2\\datos\\api.mjs\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "id": "a1a10001-0001-4001-8001-000000000003",
+      "name": "Bajar partidos del día"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger diario": {
+      "main": [
+        [{ "node": "Bajar partidos del día", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

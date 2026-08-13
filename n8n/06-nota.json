@@ -1,0 +1,51 @@
+{
+  "name": "06-nota",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 06-nota\nPara las predicciones sin resultado_real: si el partido ya terminó, calcula el resultado real y el Brier de esa predicción (fórmula oficial de Fase 1, ver PLAN.md) y actualiza la fila.\n\nAjustar la hora del trigger para que corra después de que terminen los partidos del día (ej. noche).",
+        "height": 220,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-260, -40],
+      "id": "a1a60006-0006-4006-8006-000000000001",
+      "name": "Nota"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "a1a60006-0006-4006-8006-000000000002",
+      "name": "Trigger nocturno"
+    },
+    {
+      "parameters": {
+        "command": "node --env-file=\"D:\\web 2\\.env\" \"D:\\web 2\\juez\\vivo-notas.mjs\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "id": "a1a60006-0006-4006-8006-000000000003",
+      "name": "Actualizar notas"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger nocturno": {
+      "main": [
+        [{ "node": "Actualizar notas", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
