@@ -153,3 +153,16 @@ create policy "lectura publica" on predictions for select using (true);
 create policy "lectura publica" on calibration for select using (true);
 -- api_usage no lleva política de lectura pública: es contabilidad interna,
 -- no hace falta exponerla a la web de Fase 5.
+
+-- ============================================================
+-- GRANT: "service_role ignora RLS" no significa que tenga privilegios de
+-- tabla por defecto — eso es una capa aparte, y Supabase no la otorga sola
+-- para tablas creadas desde el SQL Editor (se confirmó con un select real:
+-- 403 "permission denied for table api_usage" hasta agregar esto).
+-- ============================================================
+grant select, insert, update, delete on
+  teams, fixtures, lineups, absences, predictions, calibration, api_usage
+  to service_role;
+grant usage, select on all sequences in schema public to service_role;
+
+grant select on teams, fixtures, lineups, absences, predictions, calibration to anon;
