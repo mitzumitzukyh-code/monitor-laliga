@@ -4,6 +4,35 @@ Siete flujos, cada uno dispara un script de Node que ya existe y tiene su
 prueba. n8n no guarda ningún secreto: todo pasa por `--env-file="D:\web 2\.env"`
 directo al proceso de Node. **No se usa ninguna Credential de n8n.**
 
+## ⚠️ n8n deshabilita Execute Command por defecto — 5 de estos 7 flujos no corren sin arreglarlo
+
+Encontrado el 2026-08-14 en la instalación real (n8n 2.34.5,
+`@n8n/config/dist/configs/nodes.config.js`):
+
+```js
+this.exclude = ['n8n-nodes-base.executeCommand', 'n8n-nodes-base.localFileTrigger'];
+```
+
+El nodo **está en disco pero n8n no lo carga**. Los flujos importan sin
+error, pero al abrir el nodo dice *"This node is not currently installed"* y
+no se puede ejecutar. La confirmación de "importó bien, sin errores" del
+2026-08-13 no era evidencia suficiente: el import acepta el JSON igual,
+falla en silencio hasta que intentas correrlo.
+
+Afecta a `01-partidos`, `02-contexto`, `03-fuerzas`, `04-motor`, `06-nota` y
+`99-errores`. Para habilitarlo, arrancar n8n así (dejando `localFileTrigger`
+excluido, que no se usa):
+
+```bash
+NODES_EXCLUDE='["n8n-nodes-base.localFileTrigger"]' npx n8n start
+```
+
+Está excluido a propósito porque permite ejecutar comandos arbitrarios del
+sistema desde un workflow. En una instancia local de un solo usuario el
+riesgo es acotado, pero **habilitarlo es decisión del dueño.** Para
+verificar que quedó activo: en un workflow presionar `N` y buscar "Execute
+Command"; si no aparece, la variable no se aplicó.
+
 | Archivo | Qué hace | Corre después de |
 |---|---|---|
 | `01-partidos.json` | Baja los partidos del día (football-data.org) y guarda equipos/fixtures en Supabase | — |

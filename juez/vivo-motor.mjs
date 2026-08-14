@@ -10,13 +10,27 @@ import { fileURLToPath } from 'node:url';
 import { mapaDeEquipos, historicoCompleto, partidosDe } from './vivo.mjs';
 import { fuerzas, lambdas } from '../motor/elo.mjs';
 import { probabilidades } from '../motor/dixoncoles.mjs';
-import { upsert } from '../datos/supabase.mjs';
+import { seleccionar, upsert } from '../datos/supabase.mjs';
 import { RHO, SEMIVIDA_JORNADAS, PESO_PRIOR_PARTIDOS } from '../config.mjs';
 
 export async function predecirDia(fecha) {
   const nombrePorId = await mapaDeEquipos();
-  const partidos = await partidosDe(fecha, nombrePorId);
-  if (partidos.length === 0) return { predicciones: [], sinFuerzas: [] };
+  const partidosDelDia = await partidosDe(fecha, nombrePorId);
+  if (partidosDelDia.length === 0) return { predicciones: [], sinFuerzas: [], yaPredichos: [] };
+
+  // Una predicción guardada no se reescribe. predictions tiene la predicción
+  // y su calificación (resultado_real, brier) en la MISMA fila: si se
+  // sobreescriben las probabilidades después de calificar, el brier queda
+  // apuntando a números que ya no son los que se predijeron.
+  const existentes = await seleccionar(
+    'predictions',
+    `fixture_id=in.(${partidosDelDia.map((p) => p.id).join(',')})&select=fixture_id`,
+  );
+  const yaGuardados = new Set(existentes.map((p) => p.fixture_id));
+  const partidos = partidosDelDia.filter((p) => !yaGuardados.has(p.id));
+  const yaPredichos = partidosDelDia.filter((p) => yaGuardados.has(p.id)).map((p) => p.id);
+
+  if (partidos.length === 0) return { predicciones: [], sinFuerzas: [], yaPredichos };
 
   const historico = await historicoCompleto(nombrePorId);
 
@@ -57,13 +71,13 @@ export async function predecirDia(fecha) {
     await upsert('predictions', predicciones, { onConflict: 'fixture_id' });
   }
 
-  return { predicciones, sinFuerzas };
+  return { predicciones, sinFuerzas, yaPredichos };
 }
 
 async function main() {
   const fecha = process.argv[2] || new Date().toISOString().slice(0, 10);
-  const { predicciones, sinFuerzas } = await predecirDia(fecha);
-  console.log(JSON.stringify({ fecha, predicciones: predicciones.length, sinFuerzas }));
+  const { predicciones, sinFuerzas, yaPredichos } = await predecirDia(fecha);
+  console.log(JSON.stringify({ fecha, predicciones: predicciones.length, sinFuerzas, yaPredichos: yaPredichos.length }));
 }
 
 const esEjecutadoDirectamente = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];

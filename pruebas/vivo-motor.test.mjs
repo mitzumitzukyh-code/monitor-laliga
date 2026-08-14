@@ -112,3 +112,51 @@ test('predecirDia() sin partidos ese día devuelve arreglos vacíos sin tocar Su
   assert.deepEqual(predicciones, []);
   assert.deepEqual(sinFuerzas, []);
 });
+
+// Bug real encontrado en revisión (2026-08-14): predictions guarda la
+// predicción Y su calificación (resultado_real, brier) en la MISMA fila.
+// predecirDia() hacía upsert sin filtrar las ya predichas, así que si
+// 04-motor corría dos veces el mismo día y entremedio 06-nota ya había
+// calificado el partido, el brier guardado quedaba apuntando a unas
+// probabilidades que acababan de cambiar. El comentario del propio módulo
+// ya prometía este filtro ("que todavía no tenga predicción").
+test('predecirDia() no re-predice un partido que ya tiene predicción guardada', async () => {
+  const partidoDeHoy = {
+    id: 777003,
+    date: '2099-09-11T19:00:00Z',
+    season: 2099,
+    round: 'Matchday 4',
+    home_team_id: 81,
+    away_team_id: 77,
+    home_goals: null,
+    away_goals: null,
+    status: 'TIMED',
+  };
+
+  let huboUpsert = false;
+  globalThis.fetch = async (url, opciones = {}) => {
+    const urlStr = String(url);
+    if (urlStr.includes('/rest/v1/teams')) {
+      return respuestaJSON([{ id: 81, name: 'Barcelona' }, { id: 77, name: 'Ath Bilbao' }]);
+    }
+    if (urlStr.includes('/rest/v1/predictions')) {
+      if (opciones.method === 'POST') {
+        huboUpsert = true;
+        return respuestaJSON([]);
+      }
+      // El select de predicciones existentes: este partido ya está predicho.
+      return respuestaJSON([{ fixture_id: 777003 }]);
+    }
+    if (urlStr.includes('/rest/v1/fixtures')) {
+      if (urlStr.includes('status=eq.FINISHED')) return respuestaJSON([]);
+      return respuestaJSON([partidoDeHoy]);
+    }
+    return respuestaJSON([]);
+  };
+
+  const { predicciones, yaPredichos } = await predecirDia('2099-09-11');
+
+  assert.equal(predicciones.length, 0, 'no debe re-predecir');
+  assert.deepEqual(yaPredichos, [777003]);
+  assert.equal(huboUpsert, false, 'no debe escribir nada');
+});
