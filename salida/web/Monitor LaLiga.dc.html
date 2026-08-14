@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-15458d25-6cdb-4931-99dd-1875050fc56b/styles.css">
+<script src="_ds/modernist-15458d25-6cdb-4931-99dd-1875050fc56b/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #171615; }
+  a { color: #ff563c; text-decoration: none; }
+  a:hover { color: #ff9783; }
+  ::selection { background: rgba(255,86,60,0.35); }
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #171615; color: #f3f2f2; font-family: 'Archivo', sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased;">
+
+  <div style="display: flex; align-items: stretch; justify-content: space-between; flex-wrap: wrap; border-bottom: 2px solid rgba(243,242,242,0.45); padding: 0 24px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 0;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.14em;">MONITOR LALIGA</span>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: #9b9797;">DIXON–COLES · v3 · AJUSTADO 13 AGO 2026 04:10</span>
+    </div>
+    <div style="display: flex; align-items: stretch; gap: 0;">
+      <button onClick="{{ goPanel }}" style="{{ tabPanel }}">PANEL</button>
+      <button onClick="{{ goFicha }}" style="{{ tabFicha }}">FICHA · CELTA–SEVILLA</button>
+    </div>
+  </div>
+
+  <sc-if value="{{ isPanel }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); border-bottom: 2px solid rgba(243,242,242,0.45);">
+      <div style="padding: 20px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797; margin-bottom: 10px;">ACIERTO</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(26px, 3.4vw, 40px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">51.2<span style="font-size: 20px; color: #bab6b6;">%</span></div>
+        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+          <span style="color: #ff563c;">+5.0</span>
+          <span style="color: #9b9797;">vs 46.2% = siempre al local</span>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; margin-top: 6px;">clase más probable acertada</div>
+      </div>
+      <div style="padding: 20px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797; margin-bottom: 10px;">BRIER</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(26px, 3.4vw, 40px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">0.1985</div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+          <span style="color: #ff563c;">−0.0235</span>
+          <span style="color: #9b9797;">vs 0.222 = adivinar sin datos</span>
+        </div>
+        <div style="margin-top: 10px; height: 6px; background: rgba(243,242,242,0.12); position: relative;">
+          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 89.4%; background: #ff563c;"></div>
+          <div style="position: absolute; left: 100%; top: -4px; bottom: -4px; width: 2px; background: #f3f2f2;"></div>
+        </div>
+      </div>
+      <div style="padding: 20px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797; margin-bottom: 10px;">LOG LOSS</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(26px, 3.4vw, 40px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">0.9981</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; margin-top: 10px;">1.0986 = tres vías equiprobables</div>
+      </div>
+      <div style="padding: 20px 24px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797; margin-bottom: 10px;">PARTIDOS CALIFICADOS</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(26px, 3.4vw, 40px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">1600</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; margin-top: 10px;">819 aciertos · 781 fallos</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); border-bottom: 2px solid rgba(243,242,242,0.45);">
+
+      <div style="border-right: 2px solid rgba(243,242,242,0.45);">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">PARTIDOS DEL DÍA</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; letter-spacing: 0.08em;">JORNADA 1 · 8 PARTIDOS · YA JUGADOS · λ = GOLES ESPERADOS</span>
+        </div>
+        <div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">CEL</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Celta</span>
+              <span style="color: #ff563c; font-weight: 500;">1.50</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">SEV</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Sevilla</span>
+              <span style="color: #ff563c; font-weight: 500;">1.31</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 42%; background: #ff563c;"></div>
+                <div style="width: 26%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 33%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>42</span><span>26</span><span>33</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">ESP</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Espanol</span>
+              <span style="color: #ff563c; font-weight: 500;">1.14</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">RSO</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Sociedad</span>
+              <span style="color: #ff563c; font-weight: 500;">1.31</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 32%; background: #ff563c;"></div>
+                <div style="width: 28%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 40%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>32</span><span>28</span><span>40</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">GET</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Getafe</span>
+              <span style="color: #ff563c; font-weight: 500;">0.97</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">OSA</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Osasuna</span>
+              <span style="color: #ff563c; font-weight: 500;">0.82</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 37%; background: #ff563c;"></div>
+                <div style="width: 33%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 29%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>37</span><span>33</span><span>29</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">GIR</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Girona</span>
+              <span style="color: #ff563c; font-weight: 500;">2.17</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">ELC</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Elche</span>
+              <span style="color: #ff563c; font-weight: 500;">1.03</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 63%; background: #ff563c;"></div>
+                <div style="width: 20%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 17%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>63</span><span>20</span><span>17</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">MLL</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mallorca</span>
+              <span style="color: #ff563c; font-weight: 500;">1.66</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">OVI</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Oviedo</span>
+              <span style="color: #ff563c; font-weight: 500;">0.91</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 55%; background: #ff563c;"></div>
+                <div style="width: 25%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 20%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>55</span><span>25</span><span>20</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">RMA</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Real Madrid</span>
+              <span style="color: #ff563c; font-weight: 500;">1.99</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">ATH</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Ath Bilbao</span>
+              <span style="color: #ff563c; font-weight: 500;">0.75</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 66%; background: #ff563c;"></div>
+                <div style="width: 21%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 13%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>66</span><span>21</span><span>13</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">VAL</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Valencia</span>
+              <span style="color: #ff563c; font-weight: 500;">0.98</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">BAR</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Barcelona</span>
+              <span style="color: #ff563c; font-weight: 500;">1.89</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 19%; background: #ff563c;"></div>
+                <div style="width: 23%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 58%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>19</span><span>23</span><span>58</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; align-items: center; padding: 12px 24px;">
+            <div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #f3f2f2;">L</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">VIL</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Villarreal</span>
+              <span style="color: #ff563c; font-weight: 500;">1.59</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 12px 30px minmax(0,1fr) auto; gap: 10px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; margin-top: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #9b9797;">V</span>
+              <span style="display: flex; align-items: center; justify-content: center; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; background: rgba(243,242,242,0.16); color: #f3f2f2;">ATM</span>
+              <span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Ath Madrid</span>
+              <span style="color: #ff563c; font-weight: 500;">1.52</span>
+            </div>
+              <div style="display: flex; height: 10px; margin-top: 10px; background: rgba(243,242,242,0.08);">
+                <div style="width: 39%; background: #ff563c;"></div>
+                <div style="width: 24%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div>
+                <div style="width: 36%; border: 1px solid #ff9783; box-sizing: border-box;"></div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-variant-numeric: tabular-nums; text-align: right;">
+              <span>39</span><span>24</span><span>36</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0,1fr) clamp(84px, 15%, 120px); gap: 20px; padding: 10px 24px; border-top: 1px solid rgba(243,242,242,0.28);">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; align-items: center;">
+            <span>L LOCAL · V VISITANTE</span><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 8px; background: #ff563c; display: inline-block;"></span>LOCAL</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 8px; display: inline-block; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></span>EMPATE</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 8px; display: inline-block; border: 1px solid #ff9783; box-sizing: border-box;"></span>VISITANTE</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; text-align: right; letter-spacing: 0.08em;">
+            <span>1</span><span>X</span><span>2</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">CALIBRACIÓN</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; letter-spacing: 0.08em;">PREDICHO vs OBSERVADO · 1600 PARTIDOS</span>
+        </div>
+        <div style="padding: 16px 24px 4px;">
+          <svg viewBox="0 0 470 300" style="width: 100%; height: auto; display: block;">
+            <line x1="60" y1="40" x2="60" y2="260" stroke="rgba(243,242,242,0.45)" stroke-width="2"></line>
+            <line x1="60" y1="260" x2="450" y2="260" stroke="rgba(243,242,242,0.45)" stroke-width="2"></line>
+            <line x1="60" y1="260" x2="440" y2="40" stroke="#605d5d" stroke-width="1" stroke-dasharray="4 4"></line>
+            <text x="150" y="78" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.08em">CALIBRACIÓN PERFECTA</text>
+
+            <line x1="117" y1="227" x2="117" y2="228" stroke="#ff563c" stroke-width="2"></line>
+            <line x1="164" y1="200" x2="164" y2="199" stroke="#ff563c" stroke-width="2"></line>
+            <line x1="221" y1="167" x2="221" y2="166" stroke="#ff563c" stroke-width="2"></line>
+            <line x1="276" y1="135" x2="276" y2="149" stroke="#ff563c" stroke-width="2"></line>
+            <line x1="328" y1="105" x2="328" y2="98" stroke="#ff563c" stroke-width="2"></line>
+            <line x1="384" y1="73" x2="384" y2="59" stroke="#ff563c" stroke-width="2"></line>
+
+            <circle cx="117" cy="228" r="9" fill="#ff563c"></circle>
+            <circle cx="164" cy="199" r="7.5" fill="#ff563c"></circle>
+            <circle cx="221" cy="166" r="6.5" fill="#ff563c"></circle>
+            <circle cx="276" cy="149" r="5.5" fill="none" stroke="#ff563c" stroke-width="2"></circle>
+            <circle cx="328" cy="98" r="5" fill="#ff563c"></circle>
+            <circle cx="384" cy="59" r="4" fill="#ff563c"></circle>
+
+            <text x="117" y="250" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">n1798</text>
+            <text x="164" y="222" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">n990</text>
+            <text x="221" y="189" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">n570</text>
+            <text x="276" y="172" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">n353</text>
+            <text x="328" y="82" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">n245</text>
+            <text x="384" y="43" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">n95</text>
+
+            <text x="52" y="264" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="end">0.15</text>
+            <text x="52" y="150" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="end">0.50</text>
+            <text x="52" y="44" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="end">0.85</text>
+            <text x="117" y="276" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">0.26</text>
+            <text x="221" y="276" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">0.45</text>
+            <text x="328" y="276" fill="#9b9797" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">0.64</text>
+            <text x="60" y="294" fill="#bab6b6" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.1em">PROBABILIDAD PREDICHA →</text>
+            <text x="16" y="150" fill="#bab6b6" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.1em" text-anchor="middle" transform="rotate(-90 16 150)">← FRECUENCIA OBSERVADA</text>
+          </svg>
+        </div>
+        <div style="padding: 0 24px 16px;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 8px 0; border-top: 1px solid rgba(243,242,242,0.28); border-bottom: 1px solid rgba(243,242,242,0.28); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #9b9797;">
+            <span>PREDICHO</span><span style="text-align: right;">OBSERVADO</span><span style="text-align: right;">DESVÍO</span><span style="text-align: right;">n</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-variant-numeric: tabular-nums;">
+            <span>0.255</span><span style="text-align: right;">0.253</span><span style="text-align: right; color: #bab6b6;">−0.002</span><span style="text-align: right; color: #9b9797;">1798</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-variant-numeric: tabular-nums;">
+            <span>0.342</span><span style="text-align: right;">0.345</span><span style="text-align: right; color: #bab6b6;">+0.003</span><span style="text-align: right; color: #9b9797;">990</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-variant-numeric: tabular-nums;">
+            <span>0.447</span><span style="text-align: right;">0.449</span><span style="text-align: right; color: #bab6b6;">+0.002</span><span style="text-align: right; color: #9b9797;">570</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-variant-numeric: tabular-nums; background: rgba(255,86,60,0.1);">
+            <span>0.547</span><span style="text-align: right;">0.504</span><span style="text-align: right; color: #ff563c;">−0.043</span><span style="text-align: right; color: #9b9797;">353</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px 0; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-variant-numeric: tabular-nums;">
+            <span>0.644</span><span style="text-align: right;">0.665</span><span style="text-align: right; color: #bab6b6;">+0.021</span><span style="text-align: right; color: #9b9797;">245</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-variant-numeric: tabular-nums; background: rgba(255,86,60,0.1);">
+            <span>0.746</span><span style="text-align: right;">0.789</span><span style="text-align: right; color: #ff563c;">+0.043</span><span style="text-align: right; color: #9b9797;">95</span>
+          </div>
+          <p style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: #bab6b6; margin: 14px 0 0; max-width: 46ch;">Los dos rangos marcados se salen 0.043. En 0.547 el modelo promete más de lo que entrega; en 0.746 se queda corto. Las bandas bajas están limpias.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">ÚLTIMOS RESULTADOS CALIFICADOS</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; letter-spacing: 0.08em;">LOS MISMOS 8 · 5 ACIERTOS · 3 FALLOS</span>
+      </div>
+
+      <div style="overflow-x: auto;">
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; padding: 8px 24px; border-bottom: 1px solid rgba(243,242,242,0.28); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #9b9797;">
+        <span></span><span>PARTIDO</span><span>PREDICHO</span><span>1 / X / 2</span><span style="text-align: right;">p ASIGNADA</span><span style="text-align: right;">REAL</span><span>JUICIO</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; background: #f3f2f2;"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">CEL</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Celta — Sevilla</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">SEV</span></span>
+        <span style="color: #ff563c;">1</span>
+        <span style="color: #bab6b6;">42 / 26 / 33</span>
+        <span style="text-align: right;">0.42</span>
+        <span style="text-align: right;">1–0</span>
+        <span style="letter-spacing: 0.08em;">ACIERTO</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; border: 2px solid #f3f2f2; box-sizing: border-box; transform: rotate(45deg);"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">ESP</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Espanol — Sociedad</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">RSO</span></span>
+        <span style="color: #ff563c;">2</span>
+        <span style="color: #bab6b6;">32 / 28 / 40</span>
+        <span style="text-align: right;">0.40</span>
+        <span style="text-align: right;">1–1</span>
+        <span style="letter-spacing: 0.08em;">FALLO · X</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; background: #f3f2f2;"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">GET</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Getafe — Osasuna</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">OSA</span></span>
+        <span style="color: #ff563c;">1</span>
+        <span style="color: #bab6b6;">37 / 33 / 29</span>
+        <span style="text-align: right;">0.37</span>
+        <span style="text-align: right;">1–0</span>
+        <span style="letter-spacing: 0.08em;">ACIERTO</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; border: 2px solid #f3f2f2; box-sizing: border-box; transform: rotate(45deg);"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">GIR</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Girona — Elche</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">ELC</span></span>
+        <span style="color: #ff563c;">1</span>
+        <span style="color: #bab6b6;">63 / 20 / 17</span>
+        <span style="text-align: right;">0.63</span>
+        <span style="text-align: right;">1–1</span>
+        <span style="letter-spacing: 0.08em;">FALLO · X</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; background: #f3f2f2;"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">MLL</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mallorca — Oviedo</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">OVI</span></span>
+        <span style="color: #ff563c;">1</span>
+        <span style="color: #bab6b6;">55 / 25 / 20</span>
+        <span style="text-align: right;">0.55</span>
+        <span style="text-align: right;">3–0</span>
+        <span style="letter-spacing: 0.08em;">ACIERTO</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; background: #f3f2f2;"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">RMA</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Real Madrid — Ath Bilbao</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">ATH</span></span>
+        <span style="color: #ff563c;">1</span>
+        <span style="color: #bab6b6;">66 / 21 / 13</span>
+        <span style="text-align: right;">0.66</span>
+        <span style="text-align: right;">4–2</span>
+        <span style="letter-spacing: 0.08em;">ACIERTO</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 1px solid rgba(243,242,242,0.14); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; border: 2px solid #f3f2f2; box-sizing: border-box; transform: rotate(45deg);"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">VAL</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Valencia — Barcelona</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">BAR</span></span>
+        <span style="color: #ff563c;">2</span>
+        <span style="color: #bab6b6;">19 / 23 / 58</span>
+        <span style="text-align: right;">0.58</span>
+        <span style="text-align: right;">3–1</span>
+        <span style="letter-spacing: 0.08em;">FALLO · 1</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 26px 288px 68px 120px 84px 76px 88px; gap: 16px; min-width: max-content; align-items: center; padding: 11px 24px; border-bottom: 2px solid rgba(243,242,242,0.45); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums;">
+        <span style="width: 14px; height: 14px; background: #f3f2f2;"></span>
+        <span style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;background:#f3f2f2;color:#171615;padding: 0 5px;">VIL</span><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Villarreal — Ath Madrid</span><span style="display:flex;align-items:center;justify-content:center;height:22px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:600;letter-spacing:0.04em;border:1px solid #9b9797;box-sizing:border-box;color:#d7d3d3;padding: 0 5px;">ATM</span></span>
+        <span style="color: #ff563c;">1</span>
+        <span style="color: #bab6b6;">39 / 24 / 36</span>
+        <span style="text-align: right;">0.39</span>
+        <span style="text-align: right;">5–1</span>
+        <span style="letter-spacing: 0.08em;">ACIERTO</span>
+      </div>
+
+      </div>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px 28px; padding: 12px 24px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797;">
+        <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #f3f2f2; display: inline-block;"></span>ACIERTO — cuadrado lleno</span>
+        <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border: 2px solid #f3f2f2; box-sizing: border-box; transform: rotate(45deg); display: inline-block;"></span>FALLO — rombo hueco</span>
+        <span>3 fallos de 8: dos empates no vistos y una derrota local dada por segura.</span>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isFicha }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px; padding: 24px; border-bottom: 2px solid rgba(243,242,242,0.45);">
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797; margin-bottom: 12px;">JORNADA 1 · DOMINGO 14:00 · BALAÍDOS · CALIFICADO</div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="display: block; width: 120px; height: 120px; background: rgba(243,242,242,0.08); border: 1px solid rgba(243,242,242,0.22); box-sizing: border-box;"><image-slot id="crest-cel-big" shape="rect" fit="contain" placeholder="CEL" style="width: 100%; height: 100%;"></image-slot></span>
+          <h1 style="font-family: 'Archivo', sans-serif; font-size: clamp(26px, 4.4vw, 44px); font-weight: 600; letter-spacing: -0.02em; line-height: 1; margin: 0;">Celta <span style="color: #605d5d;">vs</span> Sevilla</h1>
+          <span style="display: block; width: 120px; height: 120px; background: rgba(243,242,242,0.08); border: 1px solid rgba(243,242,242,0.22); box-sizing: border-box;"><image-slot id="crest-sev-big" shape="rect" fit="contain" placeholder="SEV" style="width: 100%; height: 100%;"></image-slot></span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px; font-family: 'IBM Plex Mono', monospace;">
+        <div style="text-align: right;">
+          <div style="font-size: 11px; letter-spacing: 0.12em; color: #9b9797;">RESULTADO REAL</div>
+          <div style="font-size: 32px; font-variant-numeric: tabular-nums; line-height: 1.1;">1–0</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; border: 2px solid #f3f2f2; padding: 10px 14px;">
+          <span style="width: 14px; height: 14px; background: #f3f2f2;"></span>
+          <span style="font-size: 13px; letter-spacing: 0.1em;">ACIERTO</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); border-bottom: 2px solid rgba(243,242,242,0.45);">
+      <div style="padding: 22px 24px; border-right: 1px solid rgba(243,242,242,0.18); background: rgba(255,86,60,0.1);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #bab6b6;">1 · GANA CELTA</div>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(34px, 4.4vw, 56px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">42</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #bab6b6;">%</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: #ff563c; margin-left: auto;">MÁS PROBABLE · OCURRIÓ</span>
+        </div>
+        <div style="height: 8px; margin-top: 16px; background: rgba(243,242,242,0.12);"><div style="width: 42%; height: 100%; background: #ff563c;"></div></div>
+      </div>
+      <div style="padding: 22px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #bab6b6;">X · EMPATE</div>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(34px, 4.4vw, 56px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">26</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #bab6b6;">%</span>
+        </div>
+        <div style="height: 8px; margin-top: 16px; background: rgba(243,242,242,0.12);"><div style="width: 26%; height: 100%; background: repeating-linear-gradient(135deg, #ff9783 0 2px, transparent 2px 5px), #7c1405;"></div></div>
+      </div>
+      <div style="padding: 22px 24px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #bab6b6;">2 · GANA SEVILLA</div>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(34px, 4.4vw, 56px); font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums;">33</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: #bab6b6;">%</span>
+        </div>
+        <div style="height: 8px; margin-top: 16px; background: rgba(243,242,242,0.12);"><div style="width: 33%; height: 100%; border: 1px solid #ff9783; box-sizing: border-box;"></div></div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); border-bottom: 2px solid rgba(243,242,242,0.45);">
+      <div style="border-right: 2px solid rgba(243,242,242,0.45);">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">MATRIZ DE MARCADORES</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; letter-spacing: 0.08em;">% POR MARCADOR EXACTO · FILAS = CELTA</span>
+        </div>
+        <div style="padding: 20px 24px 24px;">
+          <div style="display: grid; grid-template-columns: clamp(48px, 14%, 92px) repeat(6, minmax(0, 1fr)); font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums;">
+            <div style="font-size: 10px; letter-spacing: 0.1em; color: #9b9797; padding-bottom: 8px;">CELTA ↓ / SEVILLA →</div>
+            <div style="font-size: 12px; color: #bab6b6; text-align: center; padding-bottom: 8px;">0</div>
+            <div style="font-size: 12px; color: #bab6b6; text-align: center; padding-bottom: 8px;">1</div>
+            <div style="font-size: 12px; color: #bab6b6; text-align: center; padding-bottom: 8px;">2</div>
+            <div style="font-size: 12px; color: #bab6b6; text-align: center; padding-bottom: 8px;">3</div>
+            <div style="font-size: 12px; color: #bab6b6; text-align: center; padding-bottom: 8px;">4</div>
+            <div style="font-size: 12px; color: #bab6b6; text-align: center; padding-bottom: 8px;">5</div>
+
+            <div style="font-size: 12px; color: #bab6b6; display: flex; align-items: center;">0</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.49); color: #f3f2f2; outline: 1px solid #171615;">6.3</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.60); color: #f3f2f2; outline: 1px solid #171615;">7.7</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.41); color: #f3f2f2; outline: 1px solid #171615;">5.2</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.18); color: #d7d3d3; outline: 1px solid #171615;">2.3</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.05); color: #9b9797; outline: 1px solid #171615;">0.7</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.02); color: #7d7979; outline: 1px solid #171615;">0.2</div>
+
+            <div style="font-size: 12px; color: #bab6b6; display: flex; align-items: center;">1</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.69); color: #f3f2f2; outline: 2px solid #f3f2f2; outline-offset: -2px; position: relative; z-index: 1; font-weight: 600;">8.8</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.95); color: #f3f2f2; outline: 1px solid #171615;">12.1</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.61); color: #f3f2f2; outline: 1px solid #171615;">7.8</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.27); color: #d7d3d3; outline: 1px solid #171615;">3.4</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.09); color: #9b9797; outline: 1px solid #171615;">1.1</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.02); color: #7d7979; outline: 1px solid #171615;">0.3</div>
+
+            <div style="font-size: 12px; color: #bab6b6; display: flex; align-items: center;">2</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.53); color: #f3f2f2; outline: 1px solid #171615;">6.8</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.70); color: #f3f2f2; outline: 1px solid #171615;">8.9</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.46); color: #f3f2f2; outline: 1px solid #171615;">5.9</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.20); color: #d7d3d3; outline: 1px solid #171615;">2.6</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.06); color: #9b9797; outline: 1px solid #171615;">0.8</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.02); color: #7d7979; outline: 1px solid #171615;">0.2</div>
+
+            <div style="font-size: 12px; color: #bab6b6; display: flex; align-items: center;">3</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.27); color: #d7d3d3; outline: 1px solid #171615;">3.4</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.35); color: #f3f2f2; outline: 1px solid #171615;">4.5</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.23); color: #d7d3d3; outline: 1px solid #171615;">2.9</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.10); color: #9b9797; outline: 1px solid #171615;">1.3</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.03); color: #7d7979; outline: 1px solid #171615;">0.4</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.01); color: #605d5d; outline: 1px solid #171615;">0.1</div>
+
+            <div style="font-size: 12px; color: #bab6b6; display: flex; align-items: center;">4</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.10); color: #9b9797; outline: 1px solid #171615;">1.3</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.13); color: #d7d3d3; outline: 1px solid #171615;">1.7</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.09); color: #9b9797; outline: 1px solid #171615;">1.1</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.04); color: #7d7979; outline: 1px solid #171615;">0.5</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.02); color: #7d7979; outline: 1px solid #171615;">0.2</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.00); color: #605d5d; outline: 1px solid #171615;">0.0</div>
+
+            <div style="font-size: 12px; color: #bab6b6; display: flex; align-items: center;">5</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.03); color: #7d7979; outline: 1px solid #171615;">0.4</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.04); color: #7d7979; outline: 1px solid #171615;">0.5</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.02); color: #7d7979; outline: 1px solid #171615;">0.3</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.01); color: #605d5d; outline: 1px solid #171615;">0.1</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.00); color: #605d5d; outline: 1px solid #171615;">0.0</div>
+            <div style="aspect-ratio: 1.9; display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1.5vw, 15px); background: rgba(255,86,60,0.00); color: #605d5d; outline: 1px solid #171615;">0.0</div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797;">
+            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; outline: 2px solid #f3f2f2; outline-offset: -2px; background: rgba(255,86,60,0.69); display: inline-block;"></span>MARCADOR REAL 1–0 · p 8.8% · 2.º más probable</span>
+            <span style="display: flex; align-items: center; gap: 8px;">0%
+              <span style="width: 150px; height: 10px; display: inline-block; background: linear-gradient(to right, rgba(255,86,60,0.02), rgba(255,86,60,0.95));"></span>
+            12.1%</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28); font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">GOLES ESPERADOS</div>
+        <div style="padding: 20px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; font-family: 'IBM Plex Mono', monospace;">
+            <span style="font-size: 14px;">Celta</span>
+            <span style="font-size: 30px; font-variant-numeric: tabular-nums;">1.50</span>
+          </div>
+          <div style="height: 8px; margin: 8px 0 18px; background: rgba(243,242,242,0.12);"><div style="width: 69%; height: 100%; background: #ff563c;"></div></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; font-family: 'IBM Plex Mono', monospace;">
+            <span style="font-size: 14px;">Sevilla</span>
+            <span style="font-size: 30px; font-variant-numeric: tabular-nums;">1.31</span>
+          </div>
+          <div style="height: 8px; margin-top: 8px; background: rgba(243,242,242,0.12);"><div style="width: 60%; height: 100%; border: 1px solid #ff9783; box-sizing: border-box;"></div></div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; margin-top: 14px;">λ local 1.50 · λ visita 1.31 · escala 0 → 2.17 (máx. jornada)</div>
+        </div>
+
+        <div style="padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28); font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">FORMA · ÚLTIMOS 5</div>
+        <div style="padding: 18px 24px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px;">Celta</span>
+            <div style="display: flex; gap: 6px;">
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #ff563c; color: #171615;">V</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: rgba(243,242,242,0.16);">E</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: 1px solid #605d5d; box-sizing: border-box; color: #9b9797;">D</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #ff563c; color: #171615;">V</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: 1px solid #605d5d; box-sizing: border-box; color: #9b9797;">D</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px;">Sevilla</span>
+            <div style="display: flex; gap: 6px;">
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: 1px solid #605d5d; box-sizing: border-box; color: #9b9797;">D</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: 1px solid #605d5d; box-sizing: border-box; color: #9b9797;">D</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: rgba(243,242,242,0.16);">E</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #ff563c; color: #171615;">V</span>
+              <span style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; border: 1px solid #605d5d; box-sizing: border-box; color: #9b9797;">D</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797;">
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #ff563c; display: inline-block;"></span>VICTORIA</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: rgba(243,242,242,0.16); display: inline-block;"></span>EMPATE</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border: 1px solid #605d5d; box-sizing: border-box; display: inline-block;"></span>DERROTA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); border-bottom: 2px solid rgba(243,242,242,0.45);">
+      <div style="padding: 18px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797;">JUICIO DEL MODELO</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; margin-top: 8px; letter-spacing: 0.06em;">ACIERTO</div>
+      </div>
+      <div style="padding: 18px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797;">p DEL RESULTADO 1</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; margin-top: 8px; font-variant-numeric: tabular-nums;">0.42</div>
+      </div>
+      <div style="padding: 18px 24px; border-right: 1px solid rgba(243,242,242,0.18);">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797;">BRIER DEL PARTIDO</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; margin-top: 8px; font-variant-numeric: tabular-nums;">0.2138</div>
+      </div>
+      <div style="padding: 18px 24px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #9b9797;">LOG LOSS DEL PARTIDO</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; margin-top: 8px; font-variant-numeric: tabular-nums;">0.8675</div>
+      </div>
+    </div>
+
+<div style="border-bottom: 2px solid rgba(243,242,242,0.45);">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 14px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.14em;">TAMAÑO DE POSICIÓN · KELLY</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797; letter-spacing: 0.08em;">LA CUOTA LA PONÉS VOS · NO SALE DEL MODELO</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 20px; padding: 18px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+        <label><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #9b9797; display: block; margin-bottom: 6px;">CAPITAL ($)</span><input type="number" step="10" value="{{ capital }}" onChange="{{ setCapital }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; background: rgba(243,242,242,0.08); color: #f3f2f2; border: 1px solid rgba(243,242,242,0.28); padding: 8px 10px;"></label>
+        <label><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #9b9797; display: block; margin-bottom: 6px;">FRACCIÓN DE KELLY</span><input type="number" step="0.05" min="0.05" max="1" value="{{ kfrac }}" onChange="{{ setKfrac }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; background: rgba(243,242,242,0.08); color: #f3f2f2; border: 1px solid rgba(243,242,242,0.28); padding: 8px 10px;"></label>
+        <label><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #9b9797; display: block; margin-bottom: 6px;">TOPE POR APUESTA (% CAPITAL)</span><input type="number" step="0.5" min="0.5" value="{{ cap }}" onChange="{{ setCap }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; background: rgba(243,242,242,0.08); color: #f3f2f2; border: 1px solid rgba(243,242,242,0.28); padding: 8px 10px;"></label>
+      </div>
+      <div style="overflow-x: auto;">
+      <div style="display: grid; grid-template-columns: 150px 110px 130px 130px minmax(0,1fr); gap: 16px; min-width: 700px; padding: 8px 24px; border-bottom: 1px solid rgba(243,242,242,0.28); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #9b9797;">
+        <span>RESULTADO</span><span style="text-align: right;">p MODELO</span><span style="text-align: right;">CUOTA</span><span style="text-align: right;">VENTAJA</span><span style="text-align: right;">MONTO SUGERIDO</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 110px 130px 130px minmax(0,1fr); gap: 16px; min-width: 700px; align-items: center; padding: 10px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums;">1 · Celta</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right;">0.42</span>
+        <input type="number" step="0.01" value="{{ o1 }}" onChange="{{ setO1 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; background: rgba(243,242,242,0.08); color: #f3f2f2; border: 1px solid rgba(243,242,242,0.28); padding: 8px 10px; text-align: right;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; color: {{ edgeColor1 }};">{{ edge1 }}</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; font-size: 20px;">{{ stake1 }}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 110px 130px 130px minmax(0,1fr); gap: 16px; min-width: 700px; align-items: center; padding: 10px 24px; border-bottom: 1px solid rgba(243,242,242,0.14);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums;">X · Empate</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right;">0.26</span>
+        <input type="number" step="0.01" value="{{ oX }}" onChange="{{ setOX }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; background: rgba(243,242,242,0.08); color: #f3f2f2; border: 1px solid rgba(243,242,242,0.28); padding: 8px 10px; text-align: right;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; color: {{ edgeColorX }};">{{ edgeX }}</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; font-size: 20px;">{{ stakeX }}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 110px 130px 130px minmax(0,1fr); gap: 16px; min-width: 700px; align-items: center; padding: 10px 24px; border-bottom: 1px solid rgba(243,242,242,0.28);">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums;">2 · Sevilla</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right;">0.33</span>
+        <input type="number" step="0.01" value="{{ o2 }}" onChange="{{ setO2 }}" style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; width: 100%; box-sizing: border-box; background: rgba(243,242,242,0.08); color: #f3f2f2; border: 1px solid rgba(243,242,242,0.28); padding: 8px 10px; text-align: right;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; color: {{ edgeColor2 }};">{{ edge2 }}</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; font-size: 20px;">{{ stake2 }}</span>
+      </div>
+      </div>
+      <div style="padding: 14px 24px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.7; color: #9b9797; max-width: 92ch;">
+        Kelly = (p × cuota − 1) / (cuota − 1), multiplicado por la fracción y recortado al tope. Sin ventaja, monto $0.
+        El cálculo sólo vale si p está calibrada: la tabla de calibración dice que el modelo se pasa 0.043 en el rango 0.50–0.60, así que en probabilidades de ese rango el monto sale optimista.
+      </div>
+    </div>
+
+    <div style="padding: 16px 24px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9b9797;">
+      Acertó la clase pero con 0.42: por encima del azar y poco más. El marcador exacto 1–0 era el segundo de la matriz (8.8%), detrás de 1–1 (12.1%) — el empate que este modelo subestima en otros partidos aquí no salió.
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { screen: 'panel', capital: 1000, kfrac: 0.25, cap: 2, o1: 2.45, oX: 3.4, o2: 3.1 };
+  num(e, key, min) {
+    const v = parseFloat(e.target.value);
+    this.setState({ [key]: isNaN(v) ? min : Math.max(min, v) });
+  }
+  bet(p, odd) {
+    const b = odd - 1;
+    const edge = p * odd - 1;
+    if (!(b > 0) || edge <= 0) return { edge, stake: 0 };
+    const kelly = edge / b * this.state.kfrac;
+    const capped = Math.min(kelly, this.state.cap / 100);
+    return { edge, stake: capped * this.state.capital };
+  }
+  fmtEdge(edge) { return (edge >= 0 ? '+' : '−') + Math.abs(edge * 100).toFixed(1) + '%'; }
+  fmtStake(s) { return s <= 0 ? '$0' : '$' + s.toFixed(0); }
+  tab(active) {
+    return {
+      fontFamily: "'IBM Plex Mono', monospace",
+      fontSize: '11px',
+      letterSpacing: '0.12em',
+      padding: '12px 18px',
+      lineHeight: 1.35,
+      alignSelf: 'stretch',
+      display: 'flex',
+      alignItems: 'center',
+      border: 'none',
+      borderLeft: '1px solid rgba(243,242,242,0.28)',
+      background: active ? '#ff563c' : 'transparent',
+      color: active ? '#171615' : '#bab6b6',
+      cursor: 'pointer',
+      textAlign: 'left',
+      outlineOffset: '2px'
+    };
+  }
+  renderVals() {
+    const s = this.state.screen;
+    const b1 = this.bet(0.42, this.state.o1);
+    const bX = this.bet(0.26, this.state.oX);
+    const b2 = this.bet(0.33, this.state.o2);
+    return {
+      capital: this.state.capital, kfrac: this.state.kfrac, cap: this.state.cap,
+      o1: this.state.o1, oX: this.state.oX, o2: this.state.o2,
+      setCapital: e => this.num(e, 'capital', 0),
+      setKfrac: e => this.num(e, 'kfrac', 0.05),
+      setCap: e => this.num(e, 'cap', 0.5),
+      setO1: e => this.num(e, 'o1', 1.01),
+      setOX: e => this.num(e, 'oX', 1.01),
+      setO2: e => this.num(e, 'o2', 1.01),
+      edge1: this.fmtEdge(b1.edge), edgeX: this.fmtEdge(bX.edge), edge2: this.fmtEdge(b2.edge),
+      edgeColor1: b1.edge > 0 ? '#ff563c' : '#9b9797',
+      edgeColorX: bX.edge > 0 ? '#ff563c' : '#9b9797',
+      edgeColor2: b2.edge > 0 ? '#ff563c' : '#9b9797',
+      stake1: this.fmtStake(b1.stake), stakeX: this.fmtStake(bX.stake), stake2: this.fmtStake(b2.stake),
+      isPanel: s === 'panel',
+      isFicha: s === 'ficha',
+      tabPanel: this.tab(s === 'panel'),
+      tabFicha: this.tab(s === 'ficha'),
+      goPanel: () => this.setState({ screen: 'panel' }),
+      goFicha: () => this.setState({ screen: 'ficha' })
+    };
+  }
+}
+</script>
+</body>
+</html>
