@@ -6,6 +6,18 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["n8n", "start"],
       "port": 5678
+    },
+    {
+      "name": "panel-laliga",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["salida/web/servir.mjs"],
+      "port": 4321
+    },
+    {
+      "name": "panel-dota",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["D:\\monitor-dota2\\salida\\web\\servir.mjs"],
+      "port": 4321
     }
   ]
 }

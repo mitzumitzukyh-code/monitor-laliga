@@ -1,3 +1,4 @@
 .env
 datos/cache/
 node_modules/
+salida/web/index.html
